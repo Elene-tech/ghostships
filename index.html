@@ -4,200 +4,285 @@
 <title>Ghost Ships</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
-/* Layout: dark-green masthead, sticky stage tabs, one stage at a time as a ship's-log page. Light only. */
+/* Ghost-ship theme: night-sea masthead, every stage has its own colour, wide layout. Light page only. */
 :root{
-  --bg:#F9F4EA; --paper:#FFFCF3; --card:#FFFFFF; --ink:#14231C; --ink2:#3E4F46; --line:#D8CDB4;
-  --deep:#1B4332; --green:#0B6B3A; --gold:#E8B021; --lime:#AEDE16; --orange:#FF6A1A; --oink:#A63700;
-  --ok:#DCF2E3; --bad:#FFE3D6; --mist:#EFE7D3;
+  --bg:#E9F0F5; --card:#FFFFFF; --ink:#0E1B2B; --ink2:#42536A; --line:#CFDCE6; --soft:#F5F9FC;
+  --night:#09131F; --night2:#12314B; --ghost:#F2F8FB; --glow:#8FE3E8; --lantern:#FFC857;
+  --ok:#D8F3E5; --okline:#138A57; --bad:#FFE1D8; --badline:#BE3A19;
   --serif:Georgia,"Times New Roman",serif; --sans:Arial,Helvetica,sans-serif;
+  --a:#1B3A5C; --a2:#E0E8F1; --a3:#10263F; --on:#fff;
   color-scheme:light;
 }
+[data-hue=navy]{--a:#1B3A5C;--a2:#E0E8F1;--a3:#10263F;--on:#fff}
+[data-hue=teal]{--a:#0E8C8F;--a2:#D9F2F2;--a3:#065B5D;--on:#fff}
+[data-hue=violet]{--a:#6B46D6;--a2:#ECE6FB;--a3:#432796;--on:#fff}
+[data-hue=blue]{--a:#2563D8;--a2:#E1EBFC;--a3:#173F94;--on:#fff}
+[data-hue=cyan]{--a:#0A86B8;--a2:#D9F0F8;--a3:#065070;--on:#fff}
+[data-hue=coral]{--a:#E2502B;--a2:#FDE5DC;--a3:#8C2A10;--on:#fff}
+[data-hue=rose]{--a:#C93A78;--a2:#FBE1EC;--a3:#7E1F4A;--on:#fff}
+[data-hue=amber]{--a:#F0A81A;--a2:#FEF0CC;--a3:#6E4600;--on:#15110A}
+[data-hue=indigo]{--a:#4A55C9;--a2:#E4E6FA;--a3:#2A3380;--on:#fff}
+[data-hue=mint]{--a:#16936B;--a2:#D8F2E8;--a3:#0A5840;--on:#fff}
+[data-hue=orange]{--a:#F27A14;--a2:#FFE8D3;--a3:#873C00;--on:#15110A}
+
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);-webkit-text-size-adjust:100%}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
-.wrap{max-width:840px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-h1,h2,h3{font-family:var(--serif);text-wrap:balance;line-height:1.2;margin:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--night);z-index:30}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(clamp(14px,3vw,32px),env(safe-area-inset-left,0px));padding-right:max(clamp(14px,3vw,32px),env(safe-area-inset-right,0px))}
+h1,h2,h3,h4{font-family:var(--serif);text-wrap:balance;line-height:1.2;margin:0}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--ink);outline-offset:2px}
 
-.mast{background:var(--deep);color:#FBF5E6}
-.mast .wrap{padding-block:26px 24px}
-.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
-.mast h1{font-size:clamp(32px,7vw,48px);font-weight:700;color:#FBF5E6}
-.mast p{margin:8px 0 0;max-width:46ch;color:#E6F0E5}
+/* masthead */
+.mast{position:relative;overflow:hidden;color:var(--ghost);background:
+  radial-gradient(900px 260px at 78% 110%,rgba(143,227,232,.28),transparent 70%),
+  radial-gradient(600px 200px at 10% 120%,rgba(255,200,87,.12),transparent 70%),
+  linear-gradient(135deg,var(--night) 0%,var(--night2) 100%)}
+.mast .wrap{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;padding-block:28px 26px}
+.mast .txt{min-width:0}
+.eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--lantern);margin:0 0 8px;font-weight:700}
+.mast h1{font-size:clamp(34px,7vw,58px);font-weight:700;color:var(--ghost);text-shadow:0 0 28px rgba(143,227,232,.45)}
+.mast .sub{margin:10px 0 0;max-width:52ch;color:#C9DCE8;font-size:16px}
+.mast .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.mast .chips span{font-size:13px;font-weight:700;padding:4px 11px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#E5F1F7}
+.mast svg{flex:0 0 auto;width:min(340px,38vw);height:auto;opacity:.95}
+@media (max-width:640px){.mast svg{display:none}}
 
-.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
-.tabs .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:8px;scrollbar-width:thin}
-.chip{flex:0 0 auto;min-height:40px;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;cursor:pointer;font-size:14px;white-space:nowrap}
-.chip b{font-variant-numeric:tabular-nums;margin-right:5px;color:var(--green)}
-.chip[aria-current=true]{background:var(--deep);color:#FBF5E6;border-color:var(--deep)}
-.chip[aria-current=true] b{color:var(--gold)}
+/* tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(233,240,245,.97);border-bottom:1px solid var(--line);box-shadow:0 4px 14px rgba(9,19,31,.06)}
+.tabs .wrap{display:flex;gap:7px;overflow-x:auto;padding-block:9px;scrollbar-width:thin}
+@media (min-width:1000px){.tabs .wrap{flex-wrap:wrap;overflow:visible}}
+.chip{flex:0 0 auto;min-height:40px;border:2px solid var(--line);background:var(--card);border-radius:999px;padding:5px 14px 5px 10px;cursor:pointer;font-size:14px;white-space:nowrap;display:inline-flex;align-items:center;gap:7px}
+.chip b{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border-radius:11px;background:var(--a);color:var(--on);font-size:12px;font-variant-numeric:tabular-nums;padding:0 5px}
+.chip:not(:has(b))::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--a)}
+.chip:hover{border-color:var(--a)}
+.chip[aria-current=true]{background:var(--a);color:var(--on);border-color:var(--a);font-weight:700}
+.chip[aria-current=true] b{background:#fff;color:var(--a3)}
+.chip[aria-current=true]:not(:has(b))::before{background:#fff}
 
-main{padding-block:22px 60px}
-.stagehead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:16px}
-.stagehead h2{font-size:clamp(24px,5vw,32px)}
-.mins{font-size:13px;background:var(--gold);color:var(--ink);padding:2px 10px;border-radius:999px;font-weight:700}
-.prose p{margin:0 0 12px;max-width:68ch}
-.lede{font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--ink)}
-.stack>*+*{margin-top:18px}
+main{padding-block:24px 70px}
+.stagewrap{--hl:var(--a2)}
+.stagehead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-bottom:18px;padding-bottom:12px;border-bottom:4px solid var(--a)}
+.stagehead h2{font-size:clamp(26px,4.6vw,38px);color:var(--a3)}
+.mins{font-size:13px;background:var(--a);color:var(--on);padding:3px 12px;border-radius:999px;font-weight:700}
+.prose p{margin:0 0 12px;max-width:80ch}
+.lede{font-family:var(--serif);font-size:20px;line-height:1.5;color:var(--ink);max-width:80ch;margin:0}
+.stack>*+*{margin-top:20px}
 
-.box{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px}
-.note{background:var(--mist);border-radius:12px;padding:14px 16px}
-.note h3{font-size:17px;margin-bottom:6px}
-.note p,.note ul{margin:0 0 8px;max-width:68ch}
+/* cards */
+.box,.ex,.qs,.flipbox,.audiobox,details{background:var(--card);border:1.5px solid var(--line);border-top:5px solid var(--a);border-radius:14px;box-shadow:0 8px 22px rgba(9,19,31,.06)}
+.box{padding:18px}
+.note{background:var(--card);border:1.5px solid var(--line);border-left:7px solid var(--a);border-radius:12px;padding:16px 20px;box-shadow:0 6px 18px rgba(9,19,31,.05)}
+.note h3{font-size:19px;margin-bottom:8px;color:var(--a3)}
+.note h4{font-size:15px;margin:14px 0 6px;text-transform:uppercase;letter-spacing:.08em;color:var(--a3)}
+.note p,.note ul{margin:0 0 8px;max-width:90ch}
 .note ul{padding-left:20px}
-.note li{margin-bottom:4px}
-.ex-tag{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--oink)}
+.note li{margin-bottom:6px}
+.note b,.prose b,.lede b,.instr b,.qs li b,.read-note b{background:var(--a2);color:var(--a3);padding:1px 6px;border-radius:5px;font-weight:700}
+.eg{font-style:italic;color:var(--ink2);display:inline-block;border-left:3px solid var(--a);padding-left:8px;margin-top:2px}
+.ex-tag{display:inline-block;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--on);background:var(--a);padding:2px 10px;border-radius:999px}
 
 /* photos */
-.photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media (max-width:560px){.photos{grid-template-columns:1fr}}
-figure.photo{margin:0;background:var(--card);border:1.5px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
-figure.photo img{display:block;width:100%;height:auto}
-figure.photo figcaption{font-size:13px;color:var(--ink2);padding:8px 12px}
-.slot{display:flex;align-items:center;justify-content:center;text-align:center;min-height:170px;padding:16px;background:repeating-linear-gradient(135deg,var(--mist) 0 12px,#F4EEDD 12px 24px);color:var(--ink2);font-family:var(--serif);font-style:italic}
-.slot label{display:inline-block;margin-top:8px;font-family:var(--sans);font-style:normal;font-size:13px;background:var(--gold);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+.photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+figure.photo{margin:0;background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;min-width:0;box-shadow:0 8px 22px rgba(9,19,31,.08)}
+figure.photo img{display:block;width:100%;height:auto;max-height:440px;object-fit:cover}
+figure.photo figcaption{font-size:14px;color:var(--ink2);padding:10px 14px;border-top:4px solid var(--a)}
+.slot{display:flex;align-items:center;justify-content:center;text-align:center;min-height:170px;padding:16px;background:repeating-linear-gradient(135deg,var(--a2) 0 12px,#F4F8FB 12px 24px);color:var(--ink2);font-family:var(--serif);font-style:italic}
+.slot label{display:inline-block;margin-top:8px;font-family:var(--sans);font-style:normal;font-size:13px;background:var(--a);color:var(--on);padding:6px 12px;border-radius:8px;cursor:pointer}
 
-/* reading page */
-.read{background:var(--paper);border:1.5px solid var(--line);border-left:6px solid var(--green);border-radius:4px 12px 12px 4px;padding:18px 18px 8px}
-.read h3{font-size:24px;margin-bottom:2px}
-.read .sub{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--oink);margin:0 0 12px;font-weight:700}
-.read p{font-family:var(--serif);font-size:17.5px;line-height:1.7;margin:0 0 14px;max-width:62ch}
-.read p i{font-style:italic}
-.read b{font-weight:700;background:linear-gradient(transparent 62%,rgba(174,222,22,.55) 62%)}
-.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:4px 0 12px}
-.gloss div{font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
-.gloss strong{color:var(--green)}
+/* reading: text on the left, word help on the right */
+.readwrap{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px;align-items:start}
+@media (max-width:980px){.readwrap{grid-template-columns:1fr}}
+.read{background:#FFFDF6;border:1.5px solid #E5DCC2;border-left:8px solid var(--a);border-radius:6px 14px 14px 6px;padding:22px 26px 10px;box-shadow:0 8px 22px rgba(9,19,31,.07)}
+.read h3{font-size:28px;margin-bottom:2px;color:var(--a3)}
+.read .sub{font-size:12px;text-transform:uppercase;letter-spacing:.16em;color:var(--a);margin:0 0 14px;font-weight:700}
+.read p{font-family:var(--serif);font-size:18.5px;line-height:1.75;margin:0 0 16px}
+.read p i{font-style:italic;color:var(--a3)}
+.read b{font-weight:700;background:linear-gradient(transparent 55%,var(--lantern) 55%);padding:0 2px}
+.read .np{position:relative;padding-left:46px}
+.pn{position:absolute;left:0;top:3px;width:30px;height:30px;border-radius:50%;background:var(--a);color:var(--on);font-family:var(--sans);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+.gloss{background:var(--a2);border:1.5px solid var(--line);border-top:5px solid var(--a);border-radius:14px;padding:14px 16px;position:sticky;top:78px}
+@media (max-width:980px){.gloss{position:static}}
+.gloss h4{font-size:15px;text-transform:uppercase;letter-spacing:.1em;color:var(--a3);margin-bottom:8px}
+.gloss div{padding:7px 0;border-top:1px dashed rgba(14,27,43,.2);font-size:14.5px;line-height:1.4}
+.gloss div:first-of-type{border-top:0}
+.gloss strong{display:block;font-family:var(--serif);font-size:16px;color:var(--a3)}
+.gloss span{color:var(--ink)}
 
 /* discussion */
-.qs{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px}
-.qs h3{font-size:19px;margin-bottom:8px}
-.qs ol{margin:0;padding-left:0;list-style:none;counter-reset:q;display:grid;gap:10px}
-.qs li{counter-increment:q;padding-left:38px;position:relative;max-width:68ch}
-.qs li::before{content:counter(q);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--lime);color:var(--ink);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+.qs{padding:18px 20px}
+.qs h3{font-size:20px;margin-bottom:10px;color:var(--a3)}
+.qs ol{margin:0;padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr))}
+.qs li{counter-increment:q;padding:10px 12px 10px 48px;position:relative;background:var(--soft);border-radius:10px}
+.qs li::before{content:counter(q);position:absolute;left:10px;top:9px;width:28px;height:28px;border-radius:50%;background:var(--a);color:var(--on);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+
+/* flip cards */
+.flipbox{padding:18px 20px}
+.flipbox>h3{font-size:21px;color:var(--a3)}
+.flips{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:6px}
+.flip{--k:#2563D8;--ks:#E1EBFC;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:7px;min-height:150px;padding:14px 16px;border-radius:14px;border:2.5px solid var(--k);background:#fff;cursor:pointer;text-align:left;box-shadow:0 5px 14px rgba(9,19,31,.08)}
+.flip:hover{transform:translateY(-2px)}
+.flip[aria-pressed=true]{background:var(--ks)}
+.flip .fk{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;background:var(--k);color:#fff;padding:2px 9px;border-radius:999px}
+.flip .fw{font-family:var(--serif);font-size:25px;font-weight:700;color:var(--k);line-height:1.15}
+.flip .fh{font-size:12.5px;color:var(--ink2)}
+.flip .fd{font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.35}
+.flip .fe{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--ink2);line-height:1.4}
+.flip.verb{--k:#6B46D6;--ks:#ECE6FB}
+.flip.noun{--k:#2563D8;--ks:#E1EBFC}
+.flip.adjective{--k:#16936B;--ks:#D8F2E8}
+.flip.phrase{--k:#C77A00;--ks:#FEF0CC}
+.flip.collocation{--k:#E2502B;--ks:#FDE5DC}
+.flip.phrasal-verb{--k:#0E8C8F;--ks:#D9F2F2}
+.flip.word{--k:#4A55C9;--ks:#E4E6FA}
 
 /* exercises */
-.ex{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px}
-.ex>h3{font-size:20px;margin-bottom:4px}
-.instr{margin:4px 0 12px;color:var(--ink2);max-width:68ch}
-.bank{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
-.bank span{background:var(--mist);border-radius:6px;padding:3px 9px;font-size:14px;font-weight:700}
-.item{border-top:1px solid var(--line);padding:12px 0}
-.item:first-child{border-top:0;padding-top:4px}
-.q{margin:0 0 8px;max-width:68ch}
-.n{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:13px;background:var(--deep);color:#FBF5E6;font-size:13px;font-weight:700;margin-right:8px;padding:0 7px;font-variant-numeric:tabular-nums}
+.ex{padding:18px 20px}
+.ex>h3{font-size:22px;margin:6px 0 4px;color:var(--a3)}
+.instr{margin:4px 0 14px;color:var(--ink2);max-width:90ch}
+.bank{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:10px 12px;background:var(--a2);border-radius:12px}
+.bank span{background:#fff;border:2px solid var(--a);color:var(--a3);border-radius:8px;padding:3px 11px;font-size:15px;font-weight:700}
+.exbody{display:grid;gap:12px 18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr))}
+.exbody>.bank,.exbody>.defs,.exbody>.note{grid-column:1/-1}
+.item{background:var(--soft);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.q{margin:0 0 8px}
+.n{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:13px;background:var(--a);color:var(--on);font-size:13px;font-weight:700;margin-right:8px;padding:0 7px;font-variant-numeric:tabular-nums}
 .opts{display:grid;gap:8px}
 .opts.row{grid-template-columns:repeat(3,1fr)}
 @media (max-width:560px){.opts.row .l{display:none}.opts.row .opt{justify-content:center;padding:8px 4px}}
-.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;min-height:44px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
-.opt .l{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--mist);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
-.opt:hover:not([disabled]){border-color:var(--green)}
-.opt.ok{background:var(--ok);border-color:var(--green)}
-.opt.bad{background:var(--bad);border-color:var(--oink)}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;min-height:44px;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+.opt .l{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--a2);color:var(--a3);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.opt:hover:not([disabled]){border-color:var(--a);background:var(--a2)}
+.opt.ok{background:var(--ok);border-color:var(--okline)}
+.opt.bad{background:var(--bad);border-color:var(--badline)}
 .opt[disabled]{cursor:default;color:var(--ink)}
-.fb{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:15px;max-width:68ch}
+.fb{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:15px}
 .fb.ok{background:var(--ok)}
 .fb.bad{background:var(--bad)}
 .fb b{font-weight:700}
-.in{border:1.5px solid var(--ink2);border-radius:8px;padding:4px 8px;min-height:36px;background:#fff;max-width:100%}
-.in.ok{background:var(--ok);border-color:var(--green)}
-.in.bad{background:var(--bad);border-color:var(--oink)}
+.in{border:2px solid var(--ink2);border-radius:8px;padding:4px 8px;min-height:36px;background:#fff;max-width:100%}
+.in:focus{border-color:var(--a)}
+.in.ok{background:var(--ok);border-color:var(--okline)}
+.in.bad{background:var(--bad);border-color:var(--badline)}
 select.in{padding-right:4px}
-.lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--oink);margin-left:4px}
-.gn{font-size:12px;font-weight:700;color:var(--green);margin:0 3px 0 2px}
-.cloze{font-family:var(--serif);font-size:17.5px;line-height:2.3;max-width:70ch}
+.lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--a3);margin-left:4px}
+.gn{font-size:12px;font-weight:700;color:var(--a);margin:0 3px 0 2px}
+.cloze{font-family:var(--serif);font-size:18px;line-height:2.4;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;padding:14px 18px}
 .cloze p{margin:0 0 10px}
-.kw{display:inline-block;background:var(--gold);color:var(--ink);font-weight:700;letter-spacing:.08em;padding:2px 10px;border-radius:6px;font-size:14px}
+.exbody.k-cloze{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}
+.exbody.k-cloze:has(.expl:empty){grid-template-columns:1fr}
+.expl:empty{display:none}
+@media (max-width:900px){.exbody.k-cloze{grid-template-columns:1fr}}
+.kw{display:inline-block;background:var(--lantern);color:var(--ink);font-weight:700;letter-spacing:.08em;padding:2px 10px;border-radius:6px;font-size:14px}
 .kwline{line-height:2.2;margin:6px 0}
 .kwline .in{width:min(100%,360px)}
-.defs{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:6px;margin-bottom:12px;font-size:14.5px}
-.defs div{background:var(--mist);border-radius:8px;padding:6px 10px;min-width:0}
-.defs b{color:var(--green);margin-right:4px}
-.matchrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
-.matchrow:first-of-type{border-top:0}
-.matchrow .w{flex:1 1 130px;font-weight:700}
-.matchrow select{flex:0 0 auto}
-.expl{margin-top:12px;display:grid;gap:6px}
-.expl div{font-size:15px;padding:6px 10px;border-radius:8px;max-width:72ch}
+.defs{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-bottom:6px;font-size:15px}
+.defs div{background:var(--a2);border-radius:10px;padding:8px 12px;min-width:0;border-left:5px solid var(--a)}
+.defs b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--a);color:var(--on);margin-right:8px;font-size:13px}
+.matchrow{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--soft);border:1.5px solid var(--line);border-radius:12px}
+.matchrow .w{flex:1 1 130px;font-weight:700;font-size:17px;font-family:var(--serif)}
+.matchrow select{flex:0 0 auto;font-weight:700;min-width:64px}
+.matchrow .mk{font-size:14px;font-weight:700;min-width:90px}
+.expl{margin-top:0;display:grid;gap:6px}
+.expl div{font-size:15px;padding:7px 11px;border-radius:8px}
 .expl .ok{background:var(--ok)}
 .expl .bad{background:var(--bad)}
-.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
-.btn{min-height:44px;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;border:2px solid transparent}
-.btn.primary{background:var(--green);color:#fff}
-.btn.gold{background:var(--gold);color:var(--ink)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px;padding-top:14px;border-top:2px dashed var(--line)}
+.btn{min-height:44px;border-radius:10px;padding:8px 18px;font-weight:700;cursor:pointer;border:2px solid transparent}
+.btn.primary{background:var(--a);color:var(--on)}
+.btn.gold{background:var(--lantern);color:var(--ink)}
 .btn.ghost{background:var(--card);border-color:var(--ink2)}
-.btn.next{background:var(--orange);color:var(--ink)}
-.btn:hover{filter:brightness(.95)}
-.score{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
-.sm{min-height:36px;padding:4px 12px;font-size:14px}
+.btn.next{background:var(--night);color:var(--ghost)}
+.btn:hover{filter:brightness(.94)}
+.score{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums;color:var(--a3)}
+.sm{min-height:36px;padding:4px 14px;font-size:14px;margin-top:2px}
 
-/* details */
-details{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0}
-details>summary{cursor:pointer;padding:12px 16px;font-weight:700;min-height:44px}
-details>div{padding:0 16px 14px}
-details .tx p{margin:0 0 10px;max-width:66ch}
+/* details, audio */
+details>summary{cursor:pointer;padding:14px 18px;font-weight:700;min-height:44px;color:var(--a3)}
+details>div{padding:0 18px 16px}
+details .tx p{margin:0 0 10px;max-width:90ch}
 audio{width:100%}
-.audiobox{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px}
-.audiobox h3{font-size:18px;margin-bottom:8px}
+.audiobox{padding:16px 20px}
+.audiobox h3{font-size:19px;margin-bottom:10px;color:var(--a3)}
 
 /* theories */
-.cards{display:grid;gap:14px}
-.case{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
-.case header{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin-bottom:6px}
-.case h3{font-size:20px}
-.tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;background:var(--lime);color:var(--ink);padding:2px 8px;border-radius:999px}
-.tag.fic{background:var(--orange)}
-.case .nar{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.65;margin:0 0 10px;max-width:62ch}
+.cards{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr))}
+.case{--c:#E2502B;--cs:#FDE5DC;background:var(--card);border:1.5px solid var(--line);border-top:6px solid var(--c);border-radius:14px;padding:16px 18px;min-width:0;box-shadow:0 8px 22px rgba(9,19,31,.07)}
+.case:nth-child(7n+1){--c:#E2502B;--cs:#FDE5DC}
+.case:nth-child(7n+2){--c:#2563D8;--cs:#E1EBFC}
+.case:nth-child(7n+3){--c:#C77A00;--cs:#FEF0CC}
+.case:nth-child(7n+4){--c:#C93A78;--cs:#FBE1EC}
+.case:nth-child(7n+5){--c:#16936B;--cs:#D8F2E8}
+.case:nth-child(7n+6){--c:#6B46D6;--cs:#ECE6FB}
+.case:nth-child(7n+7){--c:#0A86B8;--cs:#D9F0F8}
+.case header{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-bottom:8px}
+.case h3{font-size:22px;color:var(--c)}
+.tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;background:var(--c);color:#fff;padding:2px 9px;border-radius:999px}
+.tag.fic{background:var(--ink)}
+.case .nar{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.65;margin:0 0 12px;background:var(--cs);padding:10px 12px;border-radius:10px}
 .case .evi{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14.5px}
 @media (max-width:560px){.case .evi{grid-template-columns:1fr}}
-.case .evi div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
-.case .evi b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
-.case .evi .ag b{color:var(--oink)}
-.rate{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;font-size:14px}
-.rate button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink2);background:var(--card);font-weight:700;cursor:pointer}
-.rate button[aria-pressed=true]{background:var(--deep);color:#FBF5E6;border-color:var(--deep)}
+.case .evi div{background:var(--ok);border-radius:8px;padding:8px 10px}
+.case .evi .ag{background:var(--bad)}
+.case .evi b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--okline)}
+.case .evi .ag b{color:var(--badline)}
+.rate{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;font-size:14px}
+.rate button{width:40px;height:40px;border-radius:50%;border:2px solid var(--ink2);background:var(--card);font-weight:700;cursor:pointer}
+.rate button[aria-pressed=true]{background:var(--c);color:#fff;border-color:var(--c)}
 .topline{margin-top:12px;font-weight:700}
 
+/* rule box: certainty scale */
+.rule .scale{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));margin:6px 0 4px}
+.rule .s{border-radius:14px;padding:12px 14px;border:2.5px solid}
+.rule .s-yes{background:#D8F3E5;border-color:#138A57}
+.rule .s-maybe{background:#FEF0CC;border-color:#E39A00}
+.rule .s-no{background:#FDE5DC;border-color:#E2502B}
+.rule .m{font-family:var(--serif);font-weight:700;font-size:21px;margin-bottom:4px}
+.rule .d{font-size:15px;margin-bottom:8px}
+.rule .x{background:#fff;border-radius:8px;padding:7px 10px;font-style:italic;font-size:15px}
+.rule .s b{background:rgba(255,255,255,.7);color:var(--ink)}
+
 /* tense table */
-.tw{overflow-x:auto}
-table.tt{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
-table.tt th,table.tt td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
-table.tt th{background:var(--deep);color:#FBF5E6}
-table.tt td:first-child{font-weight:700;background:var(--mist);white-space:nowrap}
-.eg{font-style:italic;color:var(--ink2)}
+.tw{overflow-x:auto;background:var(--card);border:1.5px solid var(--line);border-top:5px solid var(--a);border-radius:14px;box-shadow:0 8px 22px rgba(9,19,31,.06)}
+table.tt{border-collapse:collapse;width:100%;min-width:560px;font-size:15px}
+table.tt th,table.tt td{border-bottom:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+table.tt th{background:var(--a);color:var(--on)}
+table.tt td:first-child{font-weight:700;background:var(--a2);color:var(--a3);white-space:nowrap}
+table.tt tr:nth-child(even) td:not(:first-child){background:var(--soft)}
 
 /* writing */
-.field{display:grid;gap:4px;margin-bottom:10px}
-.field label,.lbl{font-weight:700;font-size:14px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.field label,.lbl{font-weight:700;font-size:14px;color:var(--a3)}
 textarea.in{width:100%;min-height:80px;resize:vertical;line-height:1.55}
-textarea.big{min-height:300px;font-family:var(--serif);font-size:17px}
+textarea.big{min-height:320px;font-family:var(--serif);font-size:18px}
+.box>h3{font-size:21px;margin-bottom:8px;color:var(--a3)}
 .radios{display:grid;gap:8px}
-.radios label{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:44px}
+.radios label{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border:2px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:44px}
 .radios input{margin-top:4px;width:18px;height:18px;flex:0 0 auto}
-.radios label.on{border-color:var(--green);background:var(--ok)}
+.radios label.on{border-color:var(--a);background:var(--a2)}
 .wc{font-weight:700;font-variant-numeric:tabular-nums}
-.wc.good{color:var(--green)}
-.wc.warn{color:var(--oink)}
-.checks{display:grid;gap:6px;padding:0;margin:0;list-style:none}
+.wc.good{color:var(--okline)}
+.wc.warn{color:var(--badline)}
+.checks{display:grid;gap:6px 20px;padding:0;margin:0;list-style:none;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
 .checks label{display:flex;gap:10px;align-items:flex-start;min-height:36px}
 .checks input{width:18px;height:18px;margin-top:3px;flex:0 0 auto}
-.model{font-family:var(--serif);font-size:17px;line-height:1.7}
-.model mark{background:var(--lime);color:var(--ink);padding:0 2px;border-radius:3px}
+.model{font-family:var(--serif);font-size:17.5px;line-height:1.7}
+.model mark{background:var(--lantern);color:var(--ink);padding:0 3px;border-radius:3px}
 .status{font-size:14px;min-height:20px;margin:0}
-.dresult p{margin:0 0 10px;max-width:68ch}
-.dresult .miss{background:var(--bad);text-decoration:underline wavy var(--oink);border-radius:3px;padding:0 2px}
+.dresult p{margin:0 0 10px;max-width:90ch}
+.dresult .miss{background:var(--bad);text-decoration:underline wavy var(--badline);border-radius:3px;padding:0 2px}
 .dresult .hit{background:var(--ok);border-radius:3px;padding:0 2px}
 
-.tbanner{background:var(--gold);color:var(--ink);font-size:13px;font-weight:700;text-align:center;padding:4px}
-.foot{display:flex;justify-content:space-between;gap:10px;margin-top:26px;flex-wrap:wrap}
+.tbanner{background:var(--lantern);color:var(--ink);font-size:13px;font-weight:700;text-align:center;padding:4px;margin-bottom:10px;border-radius:8px}
+.foot{display:flex;justify-content:space-between;gap:10px;margin-top:30px;flex-wrap:wrap}
 .home table{border-collapse:collapse;width:100%}
-.home td,.home th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
-.home td.m{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
-.home tr button{background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--green);font-weight:700;text-decoration:underline;min-height:32px}
+.home td,.home th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left}
+.home td.m{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap;color:var(--a3)}
+.home tr button{background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--a3);font-weight:700;text-decoration:underline;min-height:32px;font-size:16px}
 
 </style>
 </head><body>
-<div class="mast"><div class="wrap"><p class="eyebrow">Target English</p><h1>Ghost Ships</h1><p>Mary Celeste and Baychimo · B2 / FCE · 90 minutes · British English</p></div></div>
+<div class="mast"><div class="wrap"><div class="txt"><p class="eyebrow">Target English</p><h1>Ghost Ships</h1><p class="sub">The Mary Celeste, the Baychimo and the Joyita: three real ships, no crew and no explanation.</p><div class="chips"><span>B2 / FCE</span><span>90 minutes</span><span>British English</span></div></div><svg viewBox="0 0 340 190" role="img" aria-label="A pale ghost ship sailing under the moon" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="mg" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFF6D6" stop-opacity=".95"/><stop offset="1" stop-color="#FFF6D6" stop-opacity="0"/></radialGradient><linearGradient id="sl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F2F8FB" stop-opacity=".95"/><stop offset="1" stop-color="#9FD9E0" stop-opacity=".55"/></linearGradient></defs><circle cx="262" cy="52" r="58" fill="url(#mg)"/><circle cx="262" cy="52" r="24" fill="#FFF3C4"/><g opacity=".9"><path d="M168 22 V138" stroke="#CFE6EE" stroke-width="3"/><path d="M118 40 V138" stroke="#CFE6EE" stroke-width="3"/><path d="M122 46 L162 52 L158 110 L122 120 Z" fill="url(#sl)"/><path d="M174 28 L222 40 L218 112 L174 118 Z" fill="url(#sl)"/><path d="M174 118 L222 112 L226 100" fill="none" stroke="#F2F8FB" stroke-dasharray="4 4" opacity=".7"/><path d="M72 138 H252 L232 166 H96 Z" fill="#0A1F33" stroke="#8FE3E8" stroke-width="2"/><path d="M96 150 H232" stroke="#8FE3E8" stroke-width="1.5" opacity=".6"/></g><path d="M0 172 Q28 164 56 172 T112 172 T168 172 T224 172 T280 172 T340 172 V190 H0 Z" fill="#12314B" opacity=".9"/><path d="M0 182 Q34 175 68 182 T136 182 T204 182 T272 182 T340 182 V190 H0 Z" fill="#8FE3E8" opacity=".25"/></svg></div></div>
 <nav class="tabs" aria-label="Lesson stages"><div class="wrap" id="tabs"></div></nav>
 <main><div class="wrap" id="stage"></div></main>
 <script>
@@ -207,11 +292,11 @@ var LESSON = {
   stages: []
 };
 
-LESSON.stages.push({ id: 'plan', nav: 'Plan', title: 'Ghost Ships', min: 0, home: true });
+LESSON.stages.push({ id: 'plan', nav: 'Plan', title: 'Ghost Ships', min: 0, home: true, hue: 'navy' });
 
 /* 1 LEAD-IN */
 LESSON.stages.push({
-  id: 'lead', nav: 'Lead-in', title: 'Lead-in: what is a ghost ship?', min: 5,
+  id: 'lead', nav: 'Lead-in', title: 'Lead-in: what is a ghost ship?', min: 5, hue: 'teal',
   desc: 'Photos, speculation and three quick predictions.',
   blocks: [
     { t: 'html', html: `<p class="lede">An empty ship. No crew. No message. Look at the pictures and think about what you see.</p>` },
@@ -243,38 +328,60 @@ LESSON.stages.push({
 
 /* 2 VOCABULARY */
 LESSON.stages.push({
-  id: 'vocab', nav: 'Vocabulary', title: 'Vocabulary: words for the sea and the unknown', min: 7,
-  desc: 'Match 14 key words, then use them in sentences.',
+  id: 'vocab', nav: 'Vocabulary', title: 'Vocabulary: words for the sea and the unknown', min: 8, hue: 'violet',
+  desc: 'Learn 14 key words with cards, then match them and use them in sentences.',
   blocks: [
-    { t: 'html', html: `<p>Learn these words now. You will meet them again in both stories and in the listening.</p>` },
+    { t: 'html', html: `<p class="lede">First <b>learn</b> the words, then <b>practise</b> them. You will meet all of them again in the stories and in the listening.</p>` },
     {
-      t: 'ex', id: 'vmatch', kind: 'match', tag: 'Core', title: 'Match the words to the meanings',
-      instr: 'Choose a letter for each word. Press Check all.',
-      defs: [
-        'disappear suddenly and completely',
-        'the main body of a ship',
-        'leave a ship or a place for ever because staying is dangerous',
-        'goods that a ship carries',
-        'in good enough condition to sail safely',
-        'strange and a little frightening, in a quiet way',
-        'be carried slowly by wind or water, with nobody controlling you',
-        'floating on the water with nobody controlling it',
-        'the official written record of a ship’s journey',
-        'all the people who work on a ship',
-        'save a ship or its cargo from being lost',
-        'when sailors refuse to obey the captain and take control',
-        'unable to escape from a place',
-        'travelling towards a place'
-      ],
+      t: 'flip', title: 'Step 1. Word cards', instr: 'Look at the word and try to explain it. Then click the card to see the meaning and an example.',
       items: [
-        { q: 'abandon', a: 2 }, { q: 'cargo', a: 3 }, { q: 'drift', a: 6 }, { q: 'eerie', a: 5 }, { q: 'hull', a: 1 },
-        { q: 'salvage', a: 10 }, { q: 'vanish', a: 0 }, { q: 'log', a: 8 }, { q: 'crew', a: 9 }, { q: 'seaworthy', a: 4 },
-        { q: 'mutiny', a: 11 }, { q: 'adrift', a: 7 }, { q: 'trapped', a: 12 }, { q: 'bound for', a: 13 }
+        { k: 'verb', w: 'abandon', d: 'leave a ship or a place for ever because staying is dangerous', eg: 'The villagers abandoned their homes before the flood.' },
+        { k: 'noun', w: 'cargo', d: 'the goods that a ship carries', eg: 'The ship’s cargo was timber and coal.' },
+        { k: 'verb', w: 'drift', d: 'be carried slowly by wind or water, with nobody controlling you', eg: 'Without an engine, the raft drifted out to sea.' },
+        { k: 'adjective', w: 'eerie', d: 'strange and a little frightening, in a quiet way', eg: 'The empty harbour felt eerie at midnight.' },
+        { k: 'noun', w: 'hull', d: 'the main body of a ship', eg: 'A rock tore a hole in the hull.' },
+        { k: 'verb', w: 'salvage', d: 'save a ship or its cargo from being lost', eg: 'Divers salvaged gold coins from the wreck.' },
+        { k: 'verb', w: 'vanish', d: 'disappear suddenly and completely', eg: 'When the mist cleared, the island had vanished.' },
+        { k: 'noun', w: 'log', d: 'the official written record of a ship’s journey', eg: 'The officer wrote the wind speed in the log every hour.' },
+        { k: 'noun', w: 'crew', d: 'all the people who work on a ship', eg: 'The whole crew came on deck to watch the storm.' },
+        { k: 'adjective', w: 'seaworthy', d: 'in good enough condition to sail safely', eg: 'After the repairs the old yacht was seaworthy again.' },
+        { k: 'noun', w: 'mutiny', d: 'when sailors refuse to obey the captain and take control of the ship', eg: 'The captain was afraid of a mutiny after six months at sea.' },
+        { k: 'adjective', w: 'adrift', d: 'floating on the water with nobody controlling it', eg: 'The lifeboat was found adrift, with no oars.' },
+        { k: 'adjective', w: 'trapped', d: 'unable to escape from a place', eg: 'The miners were trapped underground for two days.' },
+        { k: 'phrase', w: 'bound for', d: 'travelling towards a place', eg: 'A ferry bound for Dover left at noon.' }
       ]
     },
     {
-      t: 'ex', id: 'vgap', kind: 'gap', tag: 'Core', title: 'Use the words',
-      instr: 'Type the missing word. Change the form if you need to.',
+      t: 'ex', id: 'vmatch1', kind: 'match', tag: 'Step 2', title: 'Match the words to the meanings: set 1',
+      instr: 'Read the meanings in the box. Choose the letter for each word.',
+      defs: [
+        'the main body of a ship',
+        'be carried slowly by wind or water, with nobody controlling you',
+        'disappear suddenly and completely',
+        'strange and a little frightening, in a quiet way',
+        'leave a ship or a place for ever because staying is dangerous',
+        'the goods that a ship carries',
+        'save a ship or its cargo from being lost'
+      ],
+      items: [{ q: 'abandon', a: 4 }, { q: 'cargo', a: 5 }, { q: 'drift', a: 1 }, { q: 'eerie', a: 3 }, { q: 'hull', a: 0 }, { q: 'salvage', a: 6 }, { q: 'vanish', a: 2 }]
+    },
+    {
+      t: 'ex', id: 'vmatch2', kind: 'match', tag: 'Step 2', title: 'Match the words to the meanings: set 2',
+      instr: 'Same task. Choose the letter for each word.',
+      defs: [
+        'unable to escape from a place',
+        'the official written record of a ship’s journey',
+        'travelling towards a place',
+        'when sailors refuse to obey the captain and take control',
+        'all the people who work on a ship',
+        'floating on the water with nobody controlling it',
+        'in good enough condition to sail safely'
+      ],
+      items: [{ q: 'log', a: 1 }, { q: 'crew', a: 4 }, { q: 'seaworthy', a: 6 }, { q: 'mutiny', a: 3 }, { q: 'adrift', a: 5 }, { q: 'trapped', a: 0 }, { q: 'bound for', a: 2 }]
+    },
+    {
+      t: 'ex', id: 'vgap', kind: 'gap', tag: 'Step 3', title: 'Use the words in sentences',
+      instr: 'Type the missing word from the box. Change the form if you need to. Each word is used once.',
       bank: ['adrift', 'abandon', 'drift', 'log', 'seaworthy', 'bound for', 'eerie', 'salvage'],
       items: [
         { q: `The ship was found ___ in the middle of the ocean, with nobody on board.`, a: ['adrift'], why: `<i>Adrift</i> describes a ship floating with nobody controlling it.` },
@@ -293,7 +400,7 @@ LESSON.stages.push({
 
 /* 3 MARY CELESTE */
 LESSON.stages.push({
-  id: 'mary', nav: 'Mary Celeste', title: 'Story A: the Mary Celeste', min: 9,
+  id: 'mary', nav: 'Mary Celeste', title: 'Story A: the Mary Celeste', min: 8, hue: 'blue',
   desc: 'Read the 1872 mystery and decide: True, False or Not Given.',
   blocks: [
     {
@@ -339,11 +446,11 @@ LESSON.stages.push({
 
 /* 4 BAYCHIMO */
 LESSON.stages.push({
-  id: 'baychimo', nav: 'Baychimo', title: 'Story B: the Baychimo', min: 9,
-  desc: 'Read about the Ghost Ship of the Arctic and decide again.',
+  id: 'baychimo', nav: 'Baychimo', title: 'Story B: the Baychimo', min: 9, hue: 'cyan',
+  desc: 'Read about the Ghost Ship of the Arctic, match headings and answer multiple-choice questions.',
   blocks: [
     {
-      t: 'read', title: 'The Ship That Refused to Sink', sub: 'Alaska and the Arctic, 1931–1969',
+      t: 'read', num: true, title: 'The Ship That Refused to Sink', sub: 'Alaska and the Arctic, 1931–1969',
       paras: [
         `The <i>Baychimo</i> was a steel cargo steamer, about seventy metres long. She was built in Sweden in 1914, but after the First World War she became British property, and in 1921 the Hudson's Bay Company bought her. Every summer she sailed from Vancouver to the far north of Canada and Alaska, carrying supplies to the Arctic coast and bringing back <b>furs</b>. Her crew thought of her as a tough, reliable old ship.`,
         `In autumn 1931 her luck ran out. Sailing home with a hold full of furs, she was caught by a sudden <b>blizzard</b> near Point Barrow, Alaska, and <b>pack ice</b> closed in around her. The crew managed to free her once, but she soon became <b>trapped</b> again. This time the company sent aircraft to lift most of the men to safety. About fifteen stayed behind in a <b>makeshift</b> shelter near the ship, waiting to see whether she would survive.`,
@@ -359,19 +466,30 @@ LESSON.stages.push({
       ]
     },
     {
-      t: 'ex', id: 'tfB', kind: 'tfng', tag: 'Core', title: 'True, False or Not Given?',
-      instr: 'Read the statement, find the part of the text, then decide.',
+      t: 'ex', id: 'headB', kind: 'match', tag: 'Task 1', title: 'Match a heading to each paragraph',
+      instr: 'The paragraphs are numbered 1–5. Choose the best heading for each one. There are two extra headings that you do not need.',
+      defs: [
+        'The search goes on',
+        'A new crew takes command',
+        'Caught in the ice',
+        'A tough working ship',
+        'The captain’s secret plan',
+        'Seen again and again',
+        'Lost in a storm, found, then left behind'
+      ],
       items: [
-        { q: 'The Baychimo was originally built in Britain.', a: 'F', why: `She was built in Sweden in 1914.` },
-        { q: 'The Hudson’s Bay Company bought the ship in 1921.', a: 'T', why: `<i>In 1921 the Hudson's Bay Company bought her.</i>` },
-        { q: 'In 1931 the Baychimo was carrying furs when she became trapped in ice.', a: 'T', why: `<i>Sailing home with a hold full of furs.</i>` },
-        { q: 'The whole crew was flown out of the Arctic by aircraft.', a: 'F', why: `Aircraft took <i>most</i> of the men. About fifteen stayed behind.` },
-        { q: 'After the November storm the men believed the ship had sunk.', a: 'T', why: `<i>The men were sure the ice had crushed her.</i>` },
-        { q: 'The captain had warned the company that the ship was too weak for Arctic ice.', a: 'NG', why: `The text says nothing about any warning from the captain.` },
-        { q: 'Nobody ever went aboard the Baychimo after 1931.', a: 'F', why: `In 1933 a group of travellers climbed aboard and were trapped for ten days.` },
-        { q: 'The last report of the ship was in 1969.', a: 'T', why: `<i>The last report came in 1969.</i>` },
-        { q: 'The Alaskan government has found the wreck.', a: 'F', why: `The search began in 2006, <i>so far without success</i>.` },
-        { q: 'The company paid the crew extra to stay with the ship.', a: 'NG', why: `The text does not mention any payment.` }
+        { q: 'Paragraph 1', a: 3 }, { q: 'Paragraph 2', a: 2 }, { q: 'Paragraph 3', a: 6 }, { q: 'Paragraph 4', a: 5 }, { q: 'Paragraph 5', a: 0 }
+      ]
+    },
+    {
+      t: 'ex', id: 'mcqB', kind: 'mcq', tag: 'Task 2', title: 'Choose the best answer, A, B, C or D',
+      instr: 'This is the same type of question as in FCE Reading Part 5. Only one answer is correct.',
+      items: [
+        { q: `Why did the company send aircraft in 1931?`, o: ['to bring the furs home', 'to lift most of the men to safety', 'to look for an Inuit hunter', 'to break the ice around the ship'], a: 1, why: `<i>The company sent aircraft to lift most of the men to safety.</i>` },
+        { q: `What did the men think when the storm ended and the ship had vanished?`, o: ['She had been stolen.', 'She was floating nearby.', 'The ice had crushed her.', 'She had sailed home alone.'], a: 2, why: `<i>The men were sure the ice had crushed her and that she was at the bottom of the sea.</i>` },
+        { q: `What does <b>her luck ran out</b> mean in paragraph 2?`, o: ['She had no more fuel.', 'Her period of good fortune came to an end.', 'The crew lost the ship’s papers.', 'The company refused to pay for repairs.'], a: 1, why: `<i>Her luck ran out</i> means that the good fortune ended and bad things began.` },
+        { q: `Why could the travellers who climbed aboard in 1933 not leave for ten days?`, o: ['They were ill.', 'The crew had locked the doors.', 'A storm kept them on the ship.', 'They had no food.'], a: 2, why: `<i>They were trapped on her for ten days by a storm.</i>` },
+        { q: `What is the writer’s attitude in the last paragraph?`, o: ['She is sure that the ship still floats.', 'She is certain that the experts are wrong.', 'She is bored by the story.', 'She is careful: the ship probably sank, but nobody knows.'], a: 3, why: `<i>Most experts believe that she finally sank… Nobody can be sure.</i> The writer is cautious.` }
       ]
     },
     {
@@ -386,8 +504,8 @@ LESSON.stages.push({
 
 /* 5 THEORIES */
 LESSON.stages.push({
-  id: 'theories', nav: 'Theories', title: 'Theories and mysteries', min: 6,
-  desc: 'Read the case files, rate each theory and speculate about the past.',
+  id: 'theories', nav: 'Theories', title: 'Theories and mysteries', min: 7, hue: 'coral',
+  desc: 'Read the case files, learn how to speculate about the past and practise it.',
   blocks: [
     { t: 'html', html: `<p class="lede">What really happened? Here are the theories from the documentaries. Read each case file, then rate how convincing it is.</p>` },
     {
@@ -401,10 +519,22 @@ LESSON.stages.push({
         { id: 'ice', h: 'The Arctic itself', tag: 'Baychimo', nar: `Every time men climb aboard, the Arctic closes its fist: storms, ice, silence. Some say the ship refuses to die. Others say the sea is simply keeping her.`, pro: `A steel hull, cold water and drifting ice can keep an empty ship afloat and moving for years.`, con: `Nobody has been able to prove where she went after 1969.` }
       ]
     },
-    { t: 'qs', title: 'Vote', items: [`Which theory convinces you most? Which is the weakest? Explain why.`, `Is there a theory that is not on the list? Invent one and present it like a documentary narrator.`] },
     {
-      t: 'note', html: `<h3>Speculating about the past</h3><ul><li><b>must have + past participle</b>: you are almost sure. <span class="eg">They must have left in a hurry.</span></li><li><b>might / may / could have + past participle</b>: it is possible. <span class="eg">A storm might have frightened the crew.</span></li><li><b>can't / couldn't have + past participle</b>: it is impossible. <span class="eg">Pirates can't have attacked her. The cargo was still there.</span></li></ul>`
-    },
+      t: 'note', cls: 'rule', html: `<h3>Rule: how to speculate about the past</h3>
+<p>Use a modal verb + <b>have</b> + the <b>past participle</b>. Choose the modal by asking: <b>how sure am I?</b></p>
+<div class="scale">
+<div class="s s-yes"><div class="m">must have + done</div><div class="d">I am almost sure it <b>happened</b>. I have strong evidence.</div><div class="x">The lifeboat was missing. They <b>must have left</b> in it.</div></div>
+<div class="s s-maybe"><div class="m">might / may / could have + done</div><div class="d">It is <b>possible</b>. I am not sure at all.</div><div class="x">A storm <b>might have frightened</b> the crew.</div></div>
+<div class="s s-no"><div class="m">can’t / couldn’t have + done</div><div class="d">I am almost sure it did <b>not</b> happen. It is impossible.</div><div class="x">Pirates <b>can’t have attacked</b> her. The cargo was still there.</div></div>
+</div>
+<h4>Remember</h4>
+<ul>
+<li><b>Evidence + conclusion:</b> <span class="eg">The food was untouched, so the crew can’t have run out of supplies.</span></li>
+<li><b>Negative possibility:</b> use <b>might not have</b> or <b>may not have</b> for “perhaps it did not happen”. <span class="eg">The captain might not have seen the storm coming.</span></li>
+<li><b>Do not say</b> <i>mustn’t have</i> for a negative conclusion. Use <b>can’t have</b>.</li>
+<li><b>Longer actions:</b> <b>must have been</b> + -ing. <span class="eg">They must have been sailing in circles.</span></li>
+</ul>` },
+    { t: 'qs', title: 'Vote', items: [`Which theory convinces you most? Which is the weakest? Explain why.`, `Is there a theory that is not on the list? Invent one and present it like a documentary narrator.`] },
     {
       t: 'ex', id: 'spec', kind: 'mcq', tag: 'Core', title: 'Speculate',
       instr: 'Choose the best option.',
@@ -415,6 +545,17 @@ LESSON.stages.push({
         { q: `The ship's hull was lined with cork, so she ___ sunk quickly.`, o: ['must have', 'couldn’t have', 'might have', 'would have'], a: 1, why: `Cork floats, so it was impossible: <i>couldn't have sunk</i>.` },
         { q: `The log stops on 25 November, so something ___ soon after that date.`, o: ['must have happened', 'can’t have happened', 'shouldn’t have happened', 'mustn’t have happened'], a: 0, why: `We are almost certain: <i>must have happened</i>. Note that <i>mustn't have</i> is not used for deduction.` },
         { q: `Aliens ___ taken them, but there is no evidence for it.`, o: ['must have', 'could have', 'can’t have', 'ought to have'], a: 1, why: `A possible but unproved idea: <i>could have taken</i>.` }
+      ]
+    },
+    {
+      t: 'ex', id: 'spec2', kind: 'gap', tag: 'Core', title: 'Now you: complete with must / might / can’t have',
+      instr: 'Use the verb in brackets. Write the whole phrase, for example: <b>must have gone</b>.',
+      items: [
+        { q: `The log has no entry after 25 November, so something ___ (happen) soon after that date.`, a: ['must have happened'], why: `Strong evidence, so <i>must have happened</i>.` },
+        { q: `Nobody knows for sure. The crew ___ (see) another ship in the fog.`, a: ['might have seen', 'may have seen', 'could have seen'], why: `It is only a possibility: <i>might / may / could have seen</i>.` },
+        { q: `The food and water were untouched, so the crew ___ (run out) of supplies.`, a: ['can’t have run out', 'couldn’t have run out', 'cannot have run out'], why: `The evidence makes it impossible: <i>can't have run out</i>.` },
+        { q: `There was no sign of a fight, so there ___ (be) a mutiny.`, a: ['can’t have been', 'couldn’t have been', 'cannot have been'], why: `Almost sure it did not happen: <i>can't have been</i>.` },
+        { q: `The engine was damaged, so the ship ___ (drift) for days.`, a: ['must have drifted', 'must have been drifting'], why: `A logical conclusion: <i>must have drifted</i> or <i>must have been drifting</i>.` }
       ]
     }
   ]
@@ -442,13 +583,43 @@ LESSON.scripts = {
 
 /* 6 LISTENING */
 LESSON.stages.push({
-  id: 'listen', nav: 'Listening', title: 'Listening: a documentary voice-over', min: 8,
-  desc: 'A third ghost ship, the Joyita. Notes and comprehension questions.',
+  id: 'listen', nav: 'Listening', title: 'Listening: a documentary voice-over', min: 9, hue: 'rose',
+  desc: 'Learn 10 key phrases, then listen to a third ghost ship, the Joyita.',
   blocks: [
-    { t: 'audio', src: 'media/joyita.mp3', title: 'The Ship with 25 Missing People', note: 'Listen twice. First time: just listen. Second time: complete the notes.', missing: 'The recording will appear here. Your teacher can also read the script aloud.' },
-    { t: 'note', html: `<h3>Before you listen</h3><p><b>slip out</b> leave quietly &nbsp;·&nbsp; <b>overdue</b> later than expected &nbsp;·&nbsp; <b>listing</b> leaning to one side &nbsp;·&nbsp; <b>lined with</b> covered on the inside with &nbsp;·&nbsp; <b>rust through</b> become so rusty that a hole appears &nbsp;·&nbsp; <b>fraud</b> a crime of cheating people to get money</p>` },
+    { t: 'html', html: `<p class="lede">You are going to hear a documentary voice-over about a third ghost ship, the <b>Joyita</b>. First learn the phrases you will need. Then listen.</p>` },
     {
-      t: 'ex', id: 'lnotes', kind: 'gap', tag: 'Core', title: 'Complete the notes',
+      t: 'flip', title: 'Step 1. Key phrases for the recording', instr: 'Turn each card. Read the meaning and the example.',
+      items: [
+        { k: 'phrasal verb', w: 'slip out of', d: 'leave a place quietly, without being noticed', eg: 'The fishing boat slipped out of the bay before sunrise.' },
+        { k: 'adjective', w: 'overdue', d: 'later than expected', eg: 'The train is an hour overdue.' },
+        { k: 'phrase', w: 'on the horizon', d: 'far away, where the sea or land meets the sky', eg: 'A tiny sail appeared on the horizon.' },
+        { k: 'noun', w: 'merchant ship', d: 'a ship that carries goods to sell, not passengers or soldiers', eg: 'A merchant ship from Hong Kong entered the port.' },
+        { k: 'verb', w: 'list', d: 'lean to one side (a ship that is sinking or badly loaded)', eg: 'After the wave hit her, the boat began to list.' },
+        { k: 'phrase', w: 'distress signal', d: 'a radio or light message that asks for urgent help', eg: 'The pilot sent a distress signal before the engine failed.' },
+        { k: 'phrase', w: 'be lined with', d: 'be covered on the inside with a layer of something', eg: 'The jewellery box was lined with red velvet.' },
+        { k: 'phrasal verb', w: 'rust through', d: 'become so rusty that a hole appears', eg: 'The old pipe had rusted through, and water poured in.' },
+        { k: 'noun', w: 'inquiry', d: 'an official investigation to find out the causes of something', eg: 'An inquiry followed the accident at the port.' },
+        { k: 'noun', w: 'insurance fraud', d: 'a crime: lying to an insurance company to get money', eg: 'He set fire to his own shop and was arrested for insurance fraud.' }
+      ]
+    },
+    {
+      t: 'ex', id: 'lpre', kind: 'gap', tag: 'Step 2', title: 'Before you listen: use the phrases',
+      instr: 'Complete the sentences with a word or phrase from the box. Change the form if you need to.',
+      bank: ['overdue', 'horizon', 'distress', 'inquiry', 'rust', 'list', 'lined', 'fraud'],
+      items: [
+        { q: `The ferry is two hours ___, so passengers are getting worried.`, a: ['overdue'], why: `<i>Overdue</i> means later than expected.` },
+        { q: `A small light appeared on the ___, just where the sea meets the sky.`, a: ['horizon'], why: `<i>On the horizon</i> = far away, at the edge of what you can see.` },
+        { q: `The captain sent a ___ signal when the engine caught fire.`, a: ['distress'], why: `A <i>distress signal</i> asks for urgent help.` },
+        { q: `After the disaster there was an official ___ into its causes.`, a: ['inquiry'], why: `An <i>inquiry</i> is an official investigation.` },
+        { q: `The old pipe had ___ through, and water was flooding the engine room.`, a: ['rusted'], why: `<i>Rust through</i>, Past Perfect: <i>had rusted through</i>.` },
+        { q: `After the wave hit her, the little boat began to ___ heavily to one side.`, a: ['list'], why: `<i>List</i> means to lean to one side.` },
+        { q: `The wooden box was ___ with soft velvet.`, a: ['lined'], why: `<i>Be lined with</i>: the inside is covered with something. Passive: <i>was lined</i>.` },
+        { q: `He burned down his warehouse to get the money. It was insurance ___.`, a: ['fraud'], why: `<i>Insurance fraud</i> is a crime.` }
+      ]
+    },
+    { t: 'audio', src: 'media/joyita.mp3', title: 'Step 3. Listen: The Ship with 25 Missing People', note: 'Listen twice. First time: just listen. Second time: complete the notes below.', missing: 'The recording will appear here. Your teacher can also read the script aloud.' },
+    {
+      t: 'ex', id: 'lnotes', kind: 'gap', tag: 'Core', title: 'Step 4. Complete the notes',
       instr: 'Write one word, one number or a short phrase.',
       items: [
         { q: `Joyita left the port of ___ in Samoa.`, a: ['Apia'], why: `<i>A small wooden ship called Joyita slips out of Apia harbour.</i>` },
@@ -477,7 +648,7 @@ LESSON.stages.push({
 
 /* 7 GRAMMAR */
 LESSON.stages.push({
-  id: 'grammar', nav: 'Grammar', title: 'Grammar: past tenses vs present tenses', min: 11,
+  id: 'grammar', nav: 'Grammar', title: 'Grammar: past tenses vs present tenses', min: 10, hue: 'amber',
   desc: 'Choose the right tense for the story, the documentary and the theories.',
   blocks: [
     {
@@ -553,7 +724,7 @@ LESSON.stages.push({
 
 /* 8 USE OF ENGLISH */
 LESSON.stages.push({
-  id: 'uoe', nav: 'Use of English', title: 'FCE Reading and Use of English, Parts 1–4', min: 11,
+  id: 'uoe', nav: 'Use of English', title: 'FCE Reading and Use of English, Parts 1–4', min: 9, hue: 'indigo',
   desc: 'Multiple-choice cloze, open cloze, word formation and key word transformations.',
   blocks: [
     { t: 'html', html: `<p>Four tasks in the style of the First exam. Parts 1 and 2 are the core. Parts 3 and 4 can be homework.</p>` },
@@ -620,12 +791,36 @@ LESSON.stages.push({
 
 /* 9 COLLOCATIONS AND PHRASAL VERBS */
 LESSON.stages.push({
-  id: 'colloc', nav: 'Collocations', title: 'Collocations and phrasal verbs', min: 6,
-  desc: 'Words that go together at sea, and ten phrasal verbs from the stories.',
+  id: 'colloc', nav: 'Collocations', title: 'Collocations and phrasal verbs', min: 8, hue: 'mint',
+  desc: 'Learn 8 collocations and 10 phrasal verbs with cards, then practise them.',
   blocks: [
+    { t: 'html', html: `<p class="lede">Collocations are words that <b>go together</b>. Phrasal verbs are <b>verb + particle</b> with a new meaning. Learn them first, then practise.</p>` },
     {
-      t: 'ex', id: 'c1', kind: 'gap', tag: 'Core', title: 'Sea collocations',
-      instr: 'Write one word in each gap.',
+      t: 'flip', title: 'Step 1. Phrase cards (collocations and phrasal verbs mixed)', instr: 'Click each card to see the meaning and an example. Can you guess the meaning first?',
+      items: [
+        { k: 'collocation', w: 'set sail', d: 'begin a journey by ship', eg: 'The fleet set sail at midnight.' },
+        { k: 'phrasal verb', w: 'make out', d: 'see or hear something with difficulty', eg: 'I could not make out what he was saying.' },
+        { k: 'collocation', w: 'drop anchor', d: 'lower the anchor to stop the ship', eg: 'We dropped anchor in a quiet bay.' },
+        { k: 'phrasal verb', w: 'set off', d: 'start a journey', eg: 'They set off at six in the morning.' },
+        { k: 'collocation', w: 'run aground', d: 'hit the bottom or the shore by accident', eg: 'The tanker ran aground near the harbour.' },
+        { k: 'phrasal verb', w: 'wash up', d: 'be carried onto the beach by the sea', eg: 'A wooden box washed up on the shore.' },
+        { k: 'collocation', w: 'without a trace', d: 'leaving no sign at all', eg: 'The hiker vanished without a trace.' },
+        { k: 'phrasal verb', w: 'track down', d: 'find someone or something after a long search', eg: 'The detective tracked down the missing witness.' },
+        { k: 'collocation', w: 'raise the alarm', d: 'warn people about danger', eg: 'A neighbour raised the alarm when he saw smoke.' },
+        { k: 'phrasal verb', w: 'take on (water)', d: 'let water come into a ship', eg: 'The boat was taking on water fast.' },
+        { k: 'collocation', w: 'unsolved mystery', d: 'a strange event that nobody has explained', eg: 'The theft of the painting is still an unsolved mystery.' },
+        { k: 'phrasal verb', w: 'go down', d: 'sink', eg: 'The ship went down in minutes.' },
+        { k: 'collocation', w: 'thick fog', d: 'fog so dense that you cannot see far', eg: 'Thick fog closed the airport for the day.' },
+        { k: 'phrasal verb', w: 'pick up (a signal)', d: 'receive a signal or sound', eg: 'Our radio picked up a faint voice.' },
+        { k: 'collocation', w: 'take to the lifeboats', d: 'leave a sinking ship in the lifeboats', eg: 'The passengers took to the lifeboats in good order.' },
+        { k: 'phrasal verb', w: 'turn up', d: 'appear, often unexpectedly', eg: 'Nobody thought he would turn up at the party.' },
+        { k: 'phrasal verb', w: 'close in', d: 'come nearer from all sides', eg: 'Dark clouds were closing in on the village.' },
+        { k: 'phrasal verb', w: 'put forward', d: 'suggest an idea or a plan', eg: 'She put forward a clever solution.' }
+      ]
+    },
+    {
+      t: 'ex', id: 'c1', kind: 'gap', tag: 'Step 2', title: 'Sea collocations',
+      instr: 'Write one word in each gap. Use the cards if you need help.',
       items: [
         { q: `The ship will ___ sail at dawn.`, a: ['set'], why: `<i>Set sail</i> means to begin a journey by ship.` },
         { q: `Sailors ___ anchor when they reach the harbour.`, a: ['drop', 'cast'], why: `<i>Drop anchor</i> (or <i>cast anchor</i>) means to lower the anchor.` },
@@ -638,7 +833,7 @@ LESSON.stages.push({
       ]
     },
     {
-      t: 'ex', id: 'pv', kind: 'gap', tag: 'Core', title: 'Phrasal verbs',
+      t: 'ex', id: 'pv', kind: 'gap', tag: 'Step 3', title: 'Phrasal verbs',
       instr: 'Complete each sentence with a phrasal verb from the box. Change the form if you need to.',
       bank: ['set off', 'make out', 'wash up', 'track down', 'take on', 'go down', 'pick up', 'turn up', 'close in', 'put forward'],
       items: [
@@ -659,7 +854,7 @@ LESSON.stages.push({
 
 /* 10 SPEAKING */
 LESSON.stages.push({
-  id: 'speak', nav: 'Speaking', title: 'Speaking: your theory', min: 3,
+  id: 'speak', nav: 'Speaking', title: 'Speaking: your theory', min: 3, hue: 'orange',
   desc: 'Choose a ship, defend a theory and answer follow-up questions.',
   blocks: [
     { t: 'html', html: `<p class="lede">Choose one ship and one theory. Speak for one minute: say what happened and why you think so.</p>` },
@@ -678,7 +873,7 @@ LESSON.stages.push({
 
 /* 11 DICTATION */
 LESSON.stages.push({
-  id: 'dict', nav: 'Dictation', title: 'Dictation: the lighthouse keeper', min: 5,
+  id: 'dict', nav: 'Dictation', title: 'Dictation: the lighthouse keeper', min: 5, hue: 'violet',
   desc: 'Listen, type what you hear and check your accuracy.',
   blocks: [
     { t: 'html', html: `<p class="lede">A short story to warm up your ear and your tenses before you write your own.</p>` },
@@ -688,7 +883,7 @@ LESSON.stages.push({
 
 /* 12 WRITE */
 LESSON.stages.push({
-  id: 'write', nav: 'Write', title: 'Write your own ghost-ship story', min: 10,
+  id: 'write', nav: 'Write', title: 'Write your own ghost-ship story', min: 9, hue: 'teal',
   desc: 'Plan, write, check and save your story as a Word file.',
   blocks: [
     { t: 'html', html: `<p>This is a First-style story task. Choose one of the three tasks, plan it and write 140–190 words. Use past tenses for the story. You may use the present in dialogue.</p>` },
@@ -895,7 +1090,7 @@ KINDS.match = function (ex, body, upd) {
 
 KINDS.gap = function (ex, body, upd) {
   var items = [];
-  if (ex.bank) body.appendChild(el('div', 'bank', ex.bank.map(function (w) { return '<span>' + w + '</span>'; }).join('')));
+  if (ex.bank) body.appendChild(el('div', 'bank', ex.bank.slice().sort(function (x, y) { return x.toLowerCase() < y.toLowerCase() ? -1 : 1; }).map(function (w) { return '<span>' + w + '</span>'; }).join('')));
   ex.items.forEach(function (it, i) {
     var card = el('div', 'item');
     var p = el('p', 'q', '<span class="n">' + (i + 1) + '</span>' + it.q.replace('___', '<span class="slot"></span>'));
@@ -1018,7 +1213,7 @@ function makeEx(ex) {
   box.appendChild(el('h3', null, ex.title));
   if (ex.instr) box.appendChild(el('p', 'instr', ex.instr));
   if (ex.extra) box.appendChild(el('div', 'note', ex.extra));
-  var body = el('div'); box.appendChild(body);
+  var body = el('div', 'exbody k-' + ex.kind); box.appendChild(body);
   var bar = el('div', 'bar'), score = el('span', 'score', '');
   var api;
   function upd() {
@@ -1058,12 +1253,40 @@ function makeQs(b) {
   var ol = el('ol'); b.items.forEach(function (t) { ol.appendChild(el('li', null, t)); }); d.appendChild(ol); return d;
 }
 function makeRead(b) {
+  var out = el('div', 'readwrap');
   var d = el('article', 'read'); d.appendChild(el('h3', null, b.title)); d.appendChild(el('p', 'sub', b.sub || ''));
-  b.paras.forEach(function (p) { d.appendChild(el('p', null, p)); });
+  b.paras.forEach(function (p, i) { d.appendChild(el('p', b.num ? 'np' : null, (b.num ? '<span class="pn">' + (i + 1) + '</span>' : '') + p)); });
+  out.appendChild(d);
   if (b.gloss) {
-    var g = el('div', 'gloss'); b.gloss.forEach(function (x) { g.appendChild(el('div', null, '<strong>' + x[0] + '</strong> – ' + x[1])); }); d.appendChild(g);
+    var g = el('aside', 'gloss'); g.appendChild(el('h4', null, 'Word help'));
+    b.gloss.forEach(function (x) { g.appendChild(el('div', null, '<strong>' + x[0] + '</strong><span>' + x[1] + '</span>')); }); out.appendChild(g);
   }
-  return d;
+  return out;
+}
+function makeFlip(b) {
+  var wrap = el('section', 'flipbox');
+  wrap.appendChild(el('h3', null, b.title));
+  if (b.instr) wrap.appendChild(el('p', 'instr', b.instr));
+  var grid = el('div', 'flips'), cards = [], count = el('span', 'score', '');
+  function upd() { var n = cards.filter(function (c) { return c.on; }).length; count.textContent = 'Turned: ' + n + ' / ' + cards.length; }
+  b.items.forEach(function (it) {
+    var c = el('button', 'flip ' + (it.k || 'word').replace(/\s+/g, '-')); c.type = 'button';
+    var o = { on: false, el: c };
+    function paint() {
+      c.setAttribute('aria-pressed', o.on ? 'true' : 'false');
+      c.innerHTML = o.on
+        ? '<span class="fk">' + (it.k || 'word') + '</span><span class="fd">' + it.d + '</span><span class="fe">' + it.eg + '</span>'
+        : '<span class="fk">' + (it.k || 'word') + '</span><span class="fw">' + it.w + '</span><span class="fh">turn the card</span>';
+    }
+    c.onclick = function () { o.on = !o.on; paint(); upd(); };
+    o.paint = paint; paint(); cards.push(o); grid.appendChild(c);
+  });
+  wrap.appendChild(grid);
+  var bar = el('div', 'bar');
+  bar.appendChild(btn('Turn all cards', 'ghost', function () { cards.forEach(function (o) { o.on = true; o.paint(); }); upd(); }));
+  bar.appendChild(btn('Turn them back', 'ghost', function () { cards.forEach(function (o) { o.on = false; o.paint(); }); upd(); }));
+  bar.appendChild(count); wrap.appendChild(bar); upd();
+  return wrap;
 }
 function makeDetails(b) {
   var d = el('details'); d.appendChild(el('summary', null, b.sum)); d.appendChild(el('div', 'tx', b.html)); return d;
@@ -1228,7 +1451,7 @@ function makeWrite(b) {
 function makeBlock(b) {
   switch (b.t) {
     case 'html': return el('div', 'prose', b.html);
-    case 'note': return el('div', 'note', b.html);
+    case 'note': return el('div', 'note' + (b.cls ? ' ' + b.cls : ''), b.html);
     case 'photo': return makePhoto(b);
     case 'photos': { var g = el('div', 'photos'); b.items.forEach(function (p) { g.appendChild(makePhoto(p)); }); return g; }
     case 'qs': return makeQs(b);
@@ -1237,6 +1460,7 @@ function makeBlock(b) {
     case 'details': return makeDetails(b);
     case 'audio': return makeAudio(b);
     case 'cards': return makeCards(b);
+    case 'flip': return makeFlip(b);
     case 'dictation': return makeDictation(b);
     case 'write': return makeWrite(b);
     case 'table': { var w = el('div', 'tw'); w.innerHTML = b.html; return w; }
@@ -1266,7 +1490,7 @@ function show(i) {
   cur = i; var s = L.stages[i];
   chips.forEach(function (c, k) { c.setAttribute('aria-current', k === i ? 'true' : 'false'); });
   stageEl.innerHTML = '';
-  var wrap = el('div', 'stagewrap');
+  var wrap = el('div', 'stagewrap'); wrap.setAttribute('data-hue', s.hue || 'navy');
   if (TEACHER) wrap.appendChild(el('div', 'tbanner', 'Teacher mode: use "Show answers" on any exercise'));
   var head = el('div', 'stagehead'); head.appendChild(el('h2', null, s.title)); if (s.min) head.appendChild(el('span', 'mins', s.min + ' min'));
   wrap.appendChild(head);
@@ -1285,7 +1509,7 @@ function show(i) {
 }
 
 L.stages.forEach(function (s, i) {
-  var c = el('button', 'chip', (i ? '<b>' + i + '</b>' : '') + s.nav); c.type = 'button'; c.setAttribute('aria-current', 'false');
+  var c = el('button', 'chip', (i ? '<b>' + i + '</b>' : '') + s.nav); c.type = 'button'; c.setAttribute('aria-current', 'false'); c.setAttribute('data-hue', s.hue || 'navy');
   c.onclick = function () { show(i); }; tabs.appendChild(c); chips.push(c);
 });
 var start = parseInt(sget('stage') || '0', 10); if (!(start >= 0 && start < L.stages.length)) start = 0;
