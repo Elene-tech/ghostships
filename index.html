@@ -1,0 +1,1296 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Ghost Ships</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: dark-green masthead, sticky stage tabs, one stage at a time as a ship's-log page. Light only. */
+:root{
+  --bg:#F9F4EA; --paper:#FFFCF3; --card:#FFFFFF; --ink:#14231C; --ink2:#3E4F46; --line:#D8CDB4;
+  --deep:#1B4332; --green:#0B6B3A; --gold:#E8B021; --lime:#AEDE16; --orange:#FF6A1A; --oink:#A63700;
+  --ok:#DCF2E3; --bad:#FFE3D6; --mist:#EFE7D3;
+  --serif:Georgia,"Times New Roman",serif; --sans:Arial,Helvetica,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:30}
+.wrap{max-width:840px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--serif);text-wrap:balance;line-height:1.2;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+
+.mast{background:var(--deep);color:#FBF5E6}
+.mast .wrap{padding-block:26px 24px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
+.mast h1{font-size:clamp(32px,7vw,48px);font-weight:700;color:#FBF5E6}
+.mast p{margin:8px 0 0;max-width:46ch;color:#E6F0E5}
+
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:8px;scrollbar-width:thin}
+.chip{flex:0 0 auto;min-height:40px;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;cursor:pointer;font-size:14px;white-space:nowrap}
+.chip b{font-variant-numeric:tabular-nums;margin-right:5px;color:var(--green)}
+.chip[aria-current=true]{background:var(--deep);color:#FBF5E6;border-color:var(--deep)}
+.chip[aria-current=true] b{color:var(--gold)}
+
+main{padding-block:22px 60px}
+.stagehead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:16px}
+.stagehead h2{font-size:clamp(24px,5vw,32px)}
+.mins{font-size:13px;background:var(--gold);color:var(--ink);padding:2px 10px;border-radius:999px;font-weight:700}
+.prose p{margin:0 0 12px;max-width:68ch}
+.lede{font-family:var(--serif);font-size:19px;line-height:1.5;color:var(--ink)}
+.stack>*+*{margin-top:18px}
+
+.box{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px}
+.note{background:var(--mist);border-radius:12px;padding:14px 16px}
+.note h3{font-size:17px;margin-bottom:6px}
+.note p,.note ul{margin:0 0 8px;max-width:68ch}
+.note ul{padding-left:20px}
+.note li{margin-bottom:4px}
+.ex-tag{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--oink)}
+
+/* photos */
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.photos{grid-template-columns:1fr}}
+figure.photo{margin:0;background:var(--card);border:1.5px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+figure.photo img{display:block;width:100%;height:auto}
+figure.photo figcaption{font-size:13px;color:var(--ink2);padding:8px 12px}
+.slot{display:flex;align-items:center;justify-content:center;text-align:center;min-height:170px;padding:16px;background:repeating-linear-gradient(135deg,var(--mist) 0 12px,#F4EEDD 12px 24px);color:var(--ink2);font-family:var(--serif);font-style:italic}
+.slot label{display:inline-block;margin-top:8px;font-family:var(--sans);font-style:normal;font-size:13px;background:var(--gold);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer}
+
+/* reading page */
+.read{background:var(--paper);border:1.5px solid var(--line);border-left:6px solid var(--green);border-radius:4px 12px 12px 4px;padding:18px 18px 8px}
+.read h3{font-size:24px;margin-bottom:2px}
+.read .sub{font-size:12px;text-transform:uppercase;letter-spacing:.14em;color:var(--oink);margin:0 0 12px;font-weight:700}
+.read p{font-family:var(--serif);font-size:17.5px;line-height:1.7;margin:0 0 14px;max-width:62ch}
+.read p i{font-style:italic}
+.read b{font-weight:700;background:linear-gradient(transparent 62%,rgba(174,222,22,.55) 62%)}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:4px 0 12px}
+.gloss div{font-size:14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.gloss strong{color:var(--green)}
+
+/* discussion */
+.qs{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px}
+.qs h3{font-size:19px;margin-bottom:8px}
+.qs ol{margin:0;padding-left:0;list-style:none;counter-reset:q;display:grid;gap:10px}
+.qs li{counter-increment:q;padding-left:38px;position:relative;max-width:68ch}
+.qs li::before{content:counter(q);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--lime);color:var(--ink);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+
+/* exercises */
+.ex{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px}
+.ex>h3{font-size:20px;margin-bottom:4px}
+.instr{margin:4px 0 12px;color:var(--ink2);max-width:68ch}
+.bank{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.bank span{background:var(--mist);border-radius:6px;padding:3px 9px;font-size:14px;font-weight:700}
+.item{border-top:1px solid var(--line);padding:12px 0}
+.item:first-child{border-top:0;padding-top:4px}
+.q{margin:0 0 8px;max-width:68ch}
+.n{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border-radius:13px;background:var(--deep);color:#FBF5E6;font-size:13px;font-weight:700;margin-right:8px;padding:0 7px;font-variant-numeric:tabular-nums}
+.opts{display:grid;gap:8px}
+.opts.row{grid-template-columns:repeat(3,1fr)}
+@media (max-width:560px){.opts.row .l{display:none}.opts.row .opt{justify-content:center;padding:8px 4px}}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;min-height:44px;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+.opt .l{flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:var(--mist);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.opt:hover:not([disabled]){border-color:var(--green)}
+.opt.ok{background:var(--ok);border-color:var(--green)}
+.opt.bad{background:var(--bad);border-color:var(--oink)}
+.opt[disabled]{cursor:default;color:var(--ink)}
+.fb{margin-top:8px;padding:8px 12px;border-radius:8px;font-size:15px;max-width:68ch}
+.fb.ok{background:var(--ok)}
+.fb.bad{background:var(--bad)}
+.fb b{font-weight:700}
+.in{border:1.5px solid var(--ink2);border-radius:8px;padding:4px 8px;min-height:36px;background:#fff;max-width:100%}
+.in.ok{background:var(--ok);border-color:var(--green)}
+.in.bad{background:var(--bad);border-color:var(--oink)}
+select.in{padding-right:4px}
+.lab{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--oink);margin-left:4px}
+.gn{font-size:12px;font-weight:700;color:var(--green);margin:0 3px 0 2px}
+.cloze{font-family:var(--serif);font-size:17.5px;line-height:2.3;max-width:70ch}
+.cloze p{margin:0 0 10px}
+.kw{display:inline-block;background:var(--gold);color:var(--ink);font-weight:700;letter-spacing:.08em;padding:2px 10px;border-radius:6px;font-size:14px}
+.kwline{line-height:2.2;margin:6px 0}
+.kwline .in{width:min(100%,360px)}
+.defs{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:6px;margin-bottom:12px;font-size:14.5px}
+.defs div{background:var(--mist);border-radius:8px;padding:6px 10px;min-width:0}
+.defs b{color:var(--green);margin-right:4px}
+.matchrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)}
+.matchrow:first-of-type{border-top:0}
+.matchrow .w{flex:1 1 130px;font-weight:700}
+.matchrow select{flex:0 0 auto}
+.expl{margin-top:12px;display:grid;gap:6px}
+.expl div{font-size:15px;padding:6px 10px;border-radius:8px;max-width:72ch}
+.expl .ok{background:var(--ok)}
+.expl .bad{background:var(--bad)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.btn{min-height:44px;border-radius:10px;padding:8px 16px;font-weight:700;cursor:pointer;border:2px solid transparent}
+.btn.primary{background:var(--green);color:#fff}
+.btn.gold{background:var(--gold);color:var(--ink)}
+.btn.ghost{background:var(--card);border-color:var(--ink2)}
+.btn.next{background:var(--orange);color:var(--ink)}
+.btn:hover{filter:brightness(.95)}
+.score{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+.sm{min-height:36px;padding:4px 12px;font-size:14px}
+
+/* details */
+details{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:0}
+details>summary{cursor:pointer;padding:12px 16px;font-weight:700;min-height:44px}
+details>div{padding:0 16px 14px}
+details .tx p{margin:0 0 10px;max-width:66ch}
+audio{width:100%}
+.audiobox{background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px}
+.audiobox h3{font-size:18px;margin-bottom:8px}
+
+/* theories */
+.cards{display:grid;gap:14px}
+.case{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;min-width:0}
+.case header{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline;margin-bottom:6px}
+.case h3{font-size:20px}
+.tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;background:var(--lime);color:var(--ink);padding:2px 8px;border-radius:999px}
+.tag.fic{background:var(--orange)}
+.case .nar{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1.65;margin:0 0 10px;max-width:62ch}
+.case .evi{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14.5px}
+@media (max-width:560px){.case .evi{grid-template-columns:1fr}}
+.case .evi div{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.case .evi b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--green)}
+.case .evi .ag b{color:var(--oink)}
+.rate{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;font-size:14px}
+.rate button{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--ink2);background:var(--card);font-weight:700;cursor:pointer}
+.rate button[aria-pressed=true]{background:var(--deep);color:#FBF5E6;border-color:var(--deep)}
+.topline{margin-top:12px;font-weight:700}
+
+/* tense table */
+.tw{overflow-x:auto}
+table.tt{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px}
+table.tt th,table.tt td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+table.tt th{background:var(--deep);color:#FBF5E6}
+table.tt td:first-child{font-weight:700;background:var(--mist);white-space:nowrap}
+.eg{font-style:italic;color:var(--ink2)}
+
+/* writing */
+.field{display:grid;gap:4px;margin-bottom:10px}
+.field label,.lbl{font-weight:700;font-size:14px}
+textarea.in{width:100%;min-height:80px;resize:vertical;line-height:1.55}
+textarea.big{min-height:300px;font-family:var(--serif);font-size:17px}
+.radios{display:grid;gap:8px}
+.radios label{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-height:44px}
+.radios input{margin-top:4px;width:18px;height:18px;flex:0 0 auto}
+.radios label.on{border-color:var(--green);background:var(--ok)}
+.wc{font-weight:700;font-variant-numeric:tabular-nums}
+.wc.good{color:var(--green)}
+.wc.warn{color:var(--oink)}
+.checks{display:grid;gap:6px;padding:0;margin:0;list-style:none}
+.checks label{display:flex;gap:10px;align-items:flex-start;min-height:36px}
+.checks input{width:18px;height:18px;margin-top:3px;flex:0 0 auto}
+.model{font-family:var(--serif);font-size:17px;line-height:1.7}
+.model mark{background:var(--lime);color:var(--ink);padding:0 2px;border-radius:3px}
+.status{font-size:14px;min-height:20px;margin:0}
+.dresult p{margin:0 0 10px;max-width:68ch}
+.dresult .miss{background:var(--bad);text-decoration:underline wavy var(--oink);border-radius:3px;padding:0 2px}
+.dresult .hit{background:var(--ok);border-radius:3px;padding:0 2px}
+
+.tbanner{background:var(--gold);color:var(--ink);font-size:13px;font-weight:700;text-align:center;padding:4px}
+.foot{display:flex;justify-content:space-between;gap:10px;margin-top:26px;flex-wrap:wrap}
+.home table{border-collapse:collapse;width:100%}
+.home td,.home th{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.home td.m{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.home tr button{background:none;border:0;padding:0;text-align:left;cursor:pointer;color:var(--green);font-weight:700;text-decoration:underline;min-height:32px}
+
+</style>
+</head><body>
+<div class="mast"><div class="wrap"><p class="eyebrow">Target English</p><h1>Ghost Ships</h1><p>Mary Celeste and Baychimo · B2 / FCE · 90 minutes · British English</p></div></div>
+<nav class="tabs" aria-label="Lesson stages"><div class="wrap" id="tabs"></div></nav>
+<main><div class="wrap" id="stage"></div></main>
+<script>
+var LESSON = {
+  intro: `Two real ships. No crew. No explanation. In 90 minutes you will read about the Mary Celeste and the Baychimo, listen to a documentary, practise past and present tenses, work through FCE Use of English tasks and write a ghost-ship story of your own.`,
+  homeNote: `Exercises marked "Extra" can be done as homework. The writing box keeps your text in this browser and saves it as a Word file.`,
+  stages: []
+};
+
+LESSON.stages.push({ id: 'plan', nav: 'Plan', title: 'Ghost Ships', min: 0, home: true });
+
+/* 1 LEAD-IN */
+LESSON.stages.push({
+  id: 'lead', nav: 'Lead-in', title: 'Lead-in: what is a ghost ship?', min: 5,
+  desc: 'Photos, speculation and three quick predictions.',
+  blocks: [
+    { t: 'html', html: `<p class="lede">An empty ship. No crew. No message. Look at the pictures and think about what you see.</p>` },
+    {
+      t: 'photos', items: [
+        { src: 'media/baychimo.jpg', alt: 'The steamship Baychimo surrounded by pack ice', cap: 'Photo A: a steamship stuck in pack ice.' },
+        { src: 'media/mary-celeste.jpg', alt: 'A two-masted sailing ship at sea', cap: 'Photo B: a two-masted sailing ship in a storm.', slot: 'Photo B: the Mary Celeste' }
+      ]
+    },
+    {
+      t: 'qs', title: 'Talk about it', items: [
+        `Look at photo A. What kind of ship is it? Where is it? Use <b>might</b>, <b>must</b> or <b>can't</b> to speculate.`,
+        `What does the phrase <b>ghost ship</b> make you think of? Describe the picture in your head.`,
+        `You find a ship at sea with nobody on board. What do you do first? What do you take, and what do you leave?`,
+        `Do you enjoy unsolved mysteries? Why do they stay in our memory for so long?`
+      ]
+    },
+    {
+      t: 'ex', id: 'predict', kind: 'mcq', tag: 'Core', title: 'Guess first, check later',
+      instr: 'You do not need to know the answers. Choose the one you think is most likely. You will find out in the next stages.',
+      items: [
+        { q: `In 1872 the <b>Mary Celeste</b> was found drifting in the Atlantic. What was missing?`, o: ['the cargo', 'the lifeboat', 'all the sails'], a: 1, why: `The lifeboat had gone. The cargo was almost untouched and some sails were still set.` },
+        { q: `What was the Mary Celeste carrying?`, o: ['gold coins', 'industrial alcohol', 'furs'], a: 1, why: `She carried 1,701 barrels of industrial alcohol. The Baychimo was the ship with the furs.` },
+        { q: `After her crew left her in 1931, the <b>Baychimo</b> was still seen floating in the Arctic for about…`, o: ['three months', 'four years', 'thirty-eight years'], a: 2, why: `The last report was in 1969, thirty-eight years later.` }
+      ]
+    }
+  ]
+});
+
+/* 2 VOCABULARY */
+LESSON.stages.push({
+  id: 'vocab', nav: 'Vocabulary', title: 'Vocabulary: words for the sea and the unknown', min: 7,
+  desc: 'Match 14 key words, then use them in sentences.',
+  blocks: [
+    { t: 'html', html: `<p>Learn these words now. You will meet them again in both stories and in the listening.</p>` },
+    {
+      t: 'ex', id: 'vmatch', kind: 'match', tag: 'Core', title: 'Match the words to the meanings',
+      instr: 'Choose a letter for each word. Press Check all.',
+      defs: [
+        'disappear suddenly and completely',
+        'the main body of a ship',
+        'leave a ship or a place for ever because staying is dangerous',
+        'goods that a ship carries',
+        'in good enough condition to sail safely',
+        'strange and a little frightening, in a quiet way',
+        'be carried slowly by wind or water, with nobody controlling you',
+        'floating on the water with nobody controlling it',
+        'the official written record of a ship’s journey',
+        'all the people who work on a ship',
+        'save a ship or its cargo from being lost',
+        'when sailors refuse to obey the captain and take control',
+        'unable to escape from a place',
+        'travelling towards a place'
+      ],
+      items: [
+        { q: 'abandon', a: 2 }, { q: 'cargo', a: 3 }, { q: 'drift', a: 6 }, { q: 'eerie', a: 5 }, { q: 'hull', a: 1 },
+        { q: 'salvage', a: 10 }, { q: 'vanish', a: 0 }, { q: 'log', a: 8 }, { q: 'crew', a: 9 }, { q: 'seaworthy', a: 4 },
+        { q: 'mutiny', a: 11 }, { q: 'adrift', a: 7 }, { q: 'trapped', a: 12 }, { q: 'bound for', a: 13 }
+      ]
+    },
+    {
+      t: 'ex', id: 'vgap', kind: 'gap', tag: 'Core', title: 'Use the words',
+      instr: 'Type the missing word. Change the form if you need to.',
+      bank: ['adrift', 'abandon', 'drift', 'log', 'seaworthy', 'bound for', 'eerie', 'salvage'],
+      items: [
+        { q: `The ship was found ___ in the middle of the ocean, with nobody on board.`, a: ['adrift'], why: `<i>Adrift</i> describes a ship floating with nobody controlling it.` },
+        { q: `The captain gave the order to ___ the ship before it sank.`, a: ['abandon'], why: `After <i>to</i> we use the base form: <i>abandon</i>.` },
+        { q: `After the engine failed, the little boat began to ___ towards the rocks.`, a: ['drift'], why: `<i>Drift</i> is the verb. <i>Adrift</i> is an adjective and cannot follow <i>to</i> here.` },
+        { q: `We know the ship's last position because the captain kept a careful ___.`, a: ['log', 'logbook', 'log book'], why: `A captain keeps a <i>log</i> or <i>logbook</i> with the position and the weather.` },
+        { q: `Nobody wanted to sail the old boat because it was no longer ___.`, a: ['seaworthy'], why: `<i>Seaworthy</i> means safe enough to go to sea.` },
+        { q: `The ship was ___ Genoa when she left New York.`, a: ['bound for'], why: `<i>Bound for</i> + place means travelling towards it.` },
+        { q: `The only sound was the creak of old wood. It was an ___ silence.`, a: ['eerie'], why: `<i>Eerie</i> is strange and slightly frightening. Note <i>an</i> before a vowel sound.` },
+        { q: `Anyone who finds an abandoned ship may receive money for ___ it.`, a: ['salvaging', 'salvage'], hint: 'After a preposition (for) we use the -ing form.', why: `After <i>for</i> we use the -ing form: <i>salvaging</i>.` }
+      ]
+    },
+    { t: 'note', html: `<h3>Word families (useful for Part 3)</h3><p><b>vanish</b> → vanishing (adj). <b>disappear</b> → disappearance (n). <b>abandon</b> → abandoned (adj), abandonment (n). <b>salvage</b> → salvaged (adj). <b>drift</b> → drifting (adj), drifter (n).</p>` }
+  ]
+});
+
+/* 3 MARY CELESTE */
+LESSON.stages.push({
+  id: 'mary', nav: 'Mary Celeste', title: 'Story A: the Mary Celeste', min: 9,
+  desc: 'Read the 1872 mystery and decide: True, False or Not Given.',
+  blocks: [
+    {
+      t: 'read', title: 'The Ship That Sailed On Alone', sub: 'Atlantic Ocean, 1872',
+      paras: [
+        `On <b>7 November 1872</b> the brigantine <i>Mary Celeste</i> left New York, <b>bound for</b> Genoa in Italy. In her hold were 1,701 barrels of industrial alcohol. On board were ten people: Captain Benjamin Briggs, his wife Sarah, their two-year-old daughter Sophia, and a crew of seven. Briggs was an experienced captain and, by all accounts, a careful and sober man. Nothing about the voyage looked unusual.`,
+        `Almost a month later, on 4 December, the crew of the British ship <i>Dei Gratia</i> were sailing between the Azores and Portugal when they noticed another vessel in the distance. She was moving strangely, zigzagging across the waves with her sails badly set, as if nobody was steering her. Captain Morehouse signalled again and again, but there was no reply. In the end he sent a small boat across to find out what was wrong.`,
+        `The men who climbed aboard found an empty deck. The ship was damp and untidy, but she was not sinking, and she was perfectly <b>seaworthy</b>. There was about a metre of water in the hold, and one of the two pumps had been taken apart. The lifeboat had gone. The captain's navigation instruments and the ship's papers had disappeared too. Yet there was food and water for six months, the sailors' belongings were still in their cabins, and the cargo was almost untouched: only nine barrels were empty. The last entry in the log was dated 25 November, ten days earlier, and it gave no hint of danger.`,
+        `Later writers could not resist adding drama: a hot breakfast still steaming on the table, a cat asleep by the stove. None of it was true. The real facts were strange enough. A frayed rope was trailing behind the ship, as though the lifeboat had once been tied to her. The <i>Dei Gratia</i> men sailed the ship to Gibraltar, hoping for a <b>salvage</b> reward, but a suspicious official there accused them of murder and piracy. The court found no evidence of any crime. It never found out what had really happened, either.`,
+        `Over the years people have suggested explanations: fumes from the alcohol, a violent storm, pirates, a mutiny, even a giant squid. None has ever been proved. The people on board were never seen again. The ship herself sailed on for another thirteen years and was finally wrecked off Haiti in 1885. By then her name was already a legend.`
+      ],
+      gloss: [
+        ['brigantine', 'a sailing ship with two masts'], ['hold', 'the space inside a ship where cargo is kept'],
+        ['pump', 'a machine that removes water'], ['sober', 'not drunk'],
+        ['frayed', 'worn, with loose threads at the end'], ['trailing', 'hanging or being pulled behind'],
+        ['salvage reward', 'payment for saving a ship'], ['piracy', 'robbery at sea']
+      ]
+    },
+    {
+      t: 'ex', id: 'tfA', kind: 'tfng', tag: 'Core', title: 'True, False or Not Given?',
+      instr: 'True = the text says this. False = the text says the opposite. Not Given = the text does not say.',
+      items: [
+        { q: 'The Mary Celeste left New York in November 1872.', a: 'T', why: `The text gives the date: 7 November 1872.` },
+        { q: 'Captain Briggs was travelling alone.', a: 'F', why: `He sailed with his wife, his daughter and a crew of seven.` },
+        { q: 'Briggs had a reputation as a heavy drinker.', a: 'F', why: `The text calls him a careful and sober man.` },
+        { q: 'Nobody replied when the Dei Gratia signalled.', a: 'T', why: `<i>Captain Morehouse signalled again and again, but there was no reply.</i>` },
+        { q: 'The ship was sinking when the Dei Gratia men found her.', a: 'F', why: `<i>She was not sinking, and she was perfectly seaworthy.</i>` },
+        { q: 'All the barrels of alcohol were full.', a: 'F', why: `<i>Only nine barrels were empty</i>, so almost all were full, but not all.` },
+        { q: 'The Dei Gratia crew received a salvage payment.', a: 'NG', why: `The text says they were <i>hoping for</i> a reward. It does not say if they received one.` },
+        { q: 'Captain Briggs had sailed to Genoa before.', a: 'NG', why: `The text never mentions any earlier voyage to Genoa.` },
+        { q: 'The last entry in the log was written about ten days before the ship was found.', a: 'T', why: `The log ended on 25 November, ten days earlier.` }
+      ]
+    },
+    {
+      t: 'qs', title: 'Discuss', items: [
+        `Which detail is the most mysterious for you: the missing lifeboat, the untouched cargo or the log that ends with no warning? Why?`,
+        `Imagine you are Captain Briggs and you smell alcohol fumes in the hold. Would you leave the ship? What would you do?`,
+        `Why do people add invented details, like the hot breakfast, to true stories?`
+      ]
+    }
+  ]
+});
+
+/* 4 BAYCHIMO */
+LESSON.stages.push({
+  id: 'baychimo', nav: 'Baychimo', title: 'Story B: the Baychimo', min: 9,
+  desc: 'Read about the Ghost Ship of the Arctic and decide again.',
+  blocks: [
+    {
+      t: 'read', title: 'The Ship That Refused to Sink', sub: 'Alaska and the Arctic, 1931–1969',
+      paras: [
+        `The <i>Baychimo</i> was a steel cargo steamer, about seventy metres long. She was built in Sweden in 1914, but after the First World War she became British property, and in 1921 the Hudson's Bay Company bought her. Every summer she sailed from Vancouver to the far north of Canada and Alaska, carrying supplies to the Arctic coast and bringing back <b>furs</b>. Her crew thought of her as a tough, reliable old ship.`,
+        `In autumn 1931 her luck ran out. Sailing home with a hold full of furs, she was caught by a sudden <b>blizzard</b> near Point Barrow, Alaska, and <b>pack ice</b> closed in around her. The crew managed to free her once, but she soon became <b>trapped</b> again. This time the company sent aircraft to lift most of the men to safety. About fifteen stayed behind in a <b>makeshift</b> shelter near the ship, waiting to see whether she would survive.`,
+        `Then a fierce November storm hit the coast. When it ended, the ship had vanished. The men were sure the ice had crushed her and that she was at the bottom of the sea. A few days later, however, an Inuit hunter reported that a large ship was floating about forty-five miles away. The crew tracked her down, took out the most valuable furs, and agreed that she would never survive the winter. They left her for the last time and went home.`,
+        `But the <i>Baychimo</i> did not sink. Over the next decades hunters, sailors and people travelling by dog sled saw her again and again, sometimes locked in the ice for months, sometimes drifting hundreds of miles from where she had last been seen. In 1933 a group of travellers climbed aboard and were trapped on her for ten days by a storm. Nobody ever managed to bring her home. Alaskans began to call her the Ghost Ship of the Arctic.`,
+        `The last report came in 1969, thirty-eight years after her crew had left her, when a group of Inuit saw her stuck in the ice of the Beaufort Sea. In 2006 the Alaskan government began a project to look for her wreck, so far without success. Most experts believe that she finally sank long ago. Nobody can be sure.`
+      ],
+      gloss: [
+        ['steamer', 'a ship driven by a steam engine'], ['furs', 'animal skins with the hair still on, used for clothes'],
+        ['blizzard', 'a violent snowstorm with strong wind'], ['pack ice', 'a large area of floating ice pushed together'],
+        ['makeshift', 'built quickly from whatever is available'], ['track down', 'find after a long search'],
+        ['Inuit', 'the indigenous people of the Arctic regions']
+      ]
+    },
+    {
+      t: 'ex', id: 'tfB', kind: 'tfng', tag: 'Core', title: 'True, False or Not Given?',
+      instr: 'Read the statement, find the part of the text, then decide.',
+      items: [
+        { q: 'The Baychimo was originally built in Britain.', a: 'F', why: `She was built in Sweden in 1914.` },
+        { q: 'The Hudson’s Bay Company bought the ship in 1921.', a: 'T', why: `<i>In 1921 the Hudson's Bay Company bought her.</i>` },
+        { q: 'In 1931 the Baychimo was carrying furs when she became trapped in ice.', a: 'T', why: `<i>Sailing home with a hold full of furs.</i>` },
+        { q: 'The whole crew was flown out of the Arctic by aircraft.', a: 'F', why: `Aircraft took <i>most</i> of the men. About fifteen stayed behind.` },
+        { q: 'After the November storm the men believed the ship had sunk.', a: 'T', why: `<i>The men were sure the ice had crushed her.</i>` },
+        { q: 'The captain had warned the company that the ship was too weak for Arctic ice.', a: 'NG', why: `The text says nothing about any warning from the captain.` },
+        { q: 'Nobody ever went aboard the Baychimo after 1931.', a: 'F', why: `In 1933 a group of travellers climbed aboard and were trapped for ten days.` },
+        { q: 'The last report of the ship was in 1969.', a: 'T', why: `<i>The last report came in 1969.</i>` },
+        { q: 'The Alaskan government has found the wreck.', a: 'F', why: `The search began in 2006, <i>so far without success</i>.` },
+        { q: 'The company paid the crew extra to stay with the ship.', a: 'NG', why: `The text does not mention any payment.` }
+      ]
+    },
+    {
+      t: 'qs', title: 'Discuss', items: [
+        `Why do you think the Baychimo stayed afloat for so long? Think about the hull, the cold and the ice.`,
+        `Would you try to rescue a ghost ship if you found one? Why or why not?`,
+        `Compare the two stories. In the Mary Celeste the <b>people</b> disappeared. In the Baychimo the <b>people</b> left, but the <b>ship</b> would not go away. Which mystery is stranger?`
+      ]
+    }
+  ]
+});
+
+/* 5 THEORIES */
+LESSON.stages.push({
+  id: 'theories', nav: 'Theories', title: 'Theories and mysteries', min: 6,
+  desc: 'Read the case files, rate each theory and speculate about the past.',
+  blocks: [
+    { t: 'html', html: `<p class="lede">What really happened? Here are the theories from the documentaries. Read each case file, then rate how convincing it is.</p>` },
+    {
+      t: 'cards', items: [
+        { id: 'fumes', h: 'Alcohol fumes', tag: 'Mary Celeste', nar: `Cut to the hold. The barrels are old and the sea is rough. Slowly, alcohol leaks out and fumes rise through the ship. Captain Briggs hears a loud bang. Is the whole ship about to explode? He gives the order: everyone into the lifeboat. They wait at the end of a rope, ready to climb back. Then the rope snaps.`, pro: `Experiments have shown that alcohol fumes can cause a loud explosion without damaging the ship.`, con: `The lifeboat was never found. If it was only a scare, why did nobody reach land?` },
+        { id: 'sea', h: 'Seaquake or waterspout', tag: 'Mary Celeste', nar: `The sea is calm. Then, without warning, the ocean floor shakes. Or a waterspout, a tornado over the water, tears across the deck and floods the hold. In seconds the captain decides: abandon ship.`, pro: `There was water in the hold, and the weather had been bad for two weeks.`, con: `Nothing on the ship was broken, and her sails were still set.` },
+        { id: 'pirates', h: 'Pirates', tag: 'Mary Celeste', nar: `A dark flag on the horizon. Armed men climb aboard, push the crew into the lifeboat and sail away. It is a perfect crime, except for one thing.`, pro: `The ship was empty, and some papers and instruments had gone.`, con: `Pirates would have stolen the cargo and the valuables. Nothing valuable was taken.` },
+        { id: 'mutiny', h: 'Mutiny and murder', tag: 'Mary Celeste', nar: `Below deck, tempers rise. The sailors break into the cargo, drink the alcohol and turn on their captain. By dawn, nobody is left alive to tell the story.`, pro: `An official at the court suspected foul play, and nobody was ever found.`, con: `The alcohol was industrial, so it could not be drunk, and there was no sign of a fight.` },
+        { id: 'squid', h: 'Giant squid', tag: 'Mary Celeste', nar: `Something huge rises from the deep. A giant arm wraps around the rail and pulls the sailors into the black water, one by one.`, pro: `Giant squid are real animals, and sailors have told stories about them for centuries.`, con: `An attack like that would have damaged the ship. The Mary Celeste was in good condition.` },
+        { id: 'aliens', h: 'Alien abduction', tag: 'Fiction', fic: true, nar: `Night. A strange green light hangs above the water. The engines go silent. In one flash everyone disappears: the captain, his wife, their little daughter. Believers say that aliens took them to study human beings.`, pro: `There is no evidence at all.`, con: `Why would aliens take the navigation instruments but leave the cargo and the food? And what about a ship with no crew that floated for thirty-eight years?` },
+        { id: 'ice', h: 'The Arctic itself', tag: 'Baychimo', nar: `Every time men climb aboard, the Arctic closes its fist: storms, ice, silence. Some say the ship refuses to die. Others say the sea is simply keeping her.`, pro: `A steel hull, cold water and drifting ice can keep an empty ship afloat and moving for years.`, con: `Nobody has been able to prove where she went after 1969.` }
+      ]
+    },
+    { t: 'qs', title: 'Vote', items: [`Which theory convinces you most? Which is the weakest? Explain why.`, `Is there a theory that is not on the list? Invent one and present it like a documentary narrator.`] },
+    {
+      t: 'note', html: `<h3>Speculating about the past</h3><ul><li><b>must have + past participle</b>: you are almost sure. <span class="eg">They must have left in a hurry.</span></li><li><b>might / may / could have + past participle</b>: it is possible. <span class="eg">A storm might have frightened the crew.</span></li><li><b>can't / couldn't have + past participle</b>: it is impossible. <span class="eg">Pirates can't have attacked her. The cargo was still there.</span></li></ul>`
+    },
+    {
+      t: 'ex', id: 'spec', kind: 'mcq', tag: 'Core', title: 'Speculate',
+      instr: 'Choose the best option.',
+      items: [
+        { q: `The lifeboat was missing, so the people ___ the ship in it.`, o: ['must have left', 'can’t have left', 'needn’t have left', 'shouldn’t have left'], a: 0, why: `The evidence points strongly one way, so we use <i>must have</i>.` },
+        { q: `The cargo was untouched, so pirates ___ the ship. They would have stolen it.`, o: ['must have attacked', 'can’t have attacked', 'might have attacked', 'should have attacked'], a: 1, why: `The evidence makes it impossible: <i>can't have attacked</i>.` },
+        { q: `Nobody knows for sure. The crew ___ panicked because of the fumes.`, o: ['must have', 'can’t have', 'might have', 'didn’t need to have'], a: 2, why: `It is only a possibility: <i>might have</i> panicked.` },
+        { q: `The ship's hull was lined with cork, so she ___ sunk quickly.`, o: ['must have', 'couldn’t have', 'might have', 'would have'], a: 1, why: `Cork floats, so it was impossible: <i>couldn't have sunk</i>.` },
+        { q: `The log stops on 25 November, so something ___ soon after that date.`, o: ['must have happened', 'can’t have happened', 'shouldn’t have happened', 'mustn’t have happened'], a: 0, why: `We are almost certain: <i>must have happened</i>. Note that <i>mustn't have</i> is not used for deduction.` },
+        { q: `Aliens ___ taken them, but there is no evidence for it.`, o: ['must have', 'could have', 'can’t have', 'ought to have'], a: 1, why: `A possible but unproved idea: <i>could have taken</i>.` }
+      ]
+    }
+  ]
+});
+
+/* texts that are also exported as recording scripts */
+LESSON.scripts = {
+  joyita: [
+    `October 1955. The South Pacific. At five o'clock in the morning on the third of October, a small wooden ship called Joyita slips out of Apia harbour in Samoa. She is heading for the Tokelau Islands, about four hundred and thirty kilometres to the north. On board are twenty-five people: sixteen crew and nine passengers, including a doctor, a government official and two children. The captain is a British-born sailor called Dusty Miller.`,
+    `The journey should take two days. But Joyita never arrives.`,
+    `On the sixth of October, a message comes from the island of Fakaofo: the ship is overdue. Planes and ships search a huge area of ocean. They find nothing.`,
+    `Then, on the tenth of November, five weeks after she left, the crew of a merchant ship called the Tuvalu sees something strange on the horizon. A ship, drifting, north of the island of Vanua Levu in Fiji, almost a thousand kilometres from her route. She is leaning heavily to one side, and her deck is almost under water. The men climb aboard. Nobody is there.`,
+    `The investigators make a list of what they see, and of what they do not see. The lifeboats are gone. So are the life jackets, the logbook and the navigation equipment. Four tonnes of cargo, including medical supplies, have disappeared. The ship's electric clocks have stopped at twenty-five past ten. And the radio is tuned to the international distress frequency, but it can only send a signal for about two miles.`,
+    `There is one more surprise. Joyita's hull is lined with cork. She cannot sink. So why did twenty-five people leave her?`,
+    `A government inquiry finds that a pipe under the waterline had rusted through and flooded the engine room. But it cannot explain where the people went. Some say pirates. Some say mutiny. Others talk about insurance fraud. And some, late at night, say that the sea itself took them.`,
+    `Not one of the twenty-five was ever seen again.`
+  ],
+  dictation: [
+    `It was almost midnight when the lighthouse keeper noticed the ship. She had not been there ten minutes earlier, and she was not showing any lights. The fog was so thick that he could hardly make out her hull, but he could hear a strange noise: a bell, ringing slowly across the water.`,
+    `He had been working at the lighthouse for thirty years, and he had never seen anything like it. The ship was drifting towards the rocks, yet nobody on board seemed to care. Nobody shouted, and nobody tried to turn her away from the danger.`,
+    `At dawn the fog lifted and the keeper rowed out to the wreck. The deck was empty. A lamp was still burning in the captain's cabin, and the logbook lay open on the table. The last line said: "We have been sailing in circles since Sunday." There were no signs of a fight, and the lifeboat was still tied to the side.`,
+    `"They must have left in a hurry," he whispered. But the only footprints on the wet deck were his own.`
+  ]
+};
+
+/* 6 LISTENING */
+LESSON.stages.push({
+  id: 'listen', nav: 'Listening', title: 'Listening: a documentary voice-over', min: 8,
+  desc: 'A third ghost ship, the Joyita. Notes and comprehension questions.',
+  blocks: [
+    { t: 'audio', src: 'media/joyita.mp3', title: 'The Ship with 25 Missing People', note: 'Listen twice. First time: just listen. Second time: complete the notes.', missing: 'The recording will appear here. Your teacher can also read the script aloud.' },
+    { t: 'note', html: `<h3>Before you listen</h3><p><b>slip out</b> leave quietly &nbsp;·&nbsp; <b>overdue</b> later than expected &nbsp;·&nbsp; <b>listing</b> leaning to one side &nbsp;·&nbsp; <b>lined with</b> covered on the inside with &nbsp;·&nbsp; <b>rust through</b> become so rusty that a hole appears &nbsp;·&nbsp; <b>fraud</b> a crime of cheating people to get money</p>` },
+    {
+      t: 'ex', id: 'lnotes', kind: 'gap', tag: 'Core', title: 'Complete the notes',
+      instr: 'Write one word, one number or a short phrase.',
+      items: [
+        { q: `Joyita left the port of ___ in Samoa.`, a: ['Apia'], why: `<i>A small wooden ship called Joyita slips out of Apia harbour.</i>` },
+        { q: `She was heading for the ___ Islands.`, a: ['Tokelau'], why: `<i>She is heading for the Tokelau Islands.</i>` },
+        { q: `There were ___ people on board.`, a: ['25', 'twenty-five', 'twenty five'], why: `Sixteen crew and nine passengers make twenty-five.` },
+        { q: `The captain's name was Dusty ___.`, a: ['Miller'], why: `<i>A British-born sailor called Dusty Miller.</i>` },
+        { q: `The ship was found after ___ weeks.`, a: ['five', '5'], why: `<i>On the tenth of November, five weeks after she left.</i>` },
+        { q: `She was drifting near the island of ___ in Fiji.`, a: ['Vanua Levu'], why: `<i>North of the island of Vanua Levu in Fiji.</i>` },
+        { q: `The ship's clocks had stopped at ___.`, a: ['10:25', '1025', 'twenty-five past ten', 'ten twenty-five', '25 past 10', 'twenty five past ten', 'ten twenty five'], why: `<i>Stopped at twenty-five past ten</i>, which is 10.25.` },
+        { q: `The hull was lined with ___.`, a: ['cork'], why: `Cork floats, so <i>she cannot sink</i>.` }
+      ]
+    },
+    {
+      t: 'ex', id: 'lmcq', kind: 'mcq', tag: 'Core', title: 'Choose the best answer',
+      items: [
+        { q: `What was strange about the radio?`, o: ['It was broken.', 'It was tuned to the distress frequency but could send only a short distance.', 'It was playing music.', 'It was missing.'], a: 1, why: `The radio was set to the distress frequency, but <i>it can only send a signal for about two miles</i>.` },
+        { q: `What did the inquiry find?`, o: ['A pipe had rusted through and flooded the engine room.', 'The crew had started a mutiny.', 'Pirates had attacked the ship.', 'The captain had made a mistake.'], a: 0, why: `<i>A pipe under the waterline had rusted through.</i> The other ideas are only theories.` },
+        { q: `Why is it strange that the people left the ship?`, o: ['The ship was brand new.', 'Her hull was lined with cork, so she could not sink.', 'There were no lifeboats on board.', 'She was very close to land.'], a: 1, why: `<i>Joyita's hull is lined with cork. She cannot sink.</i>` },
+        { q: `Which of these was NOT missing from the ship?`, o: ['the lifeboats', 'the logbook', 'the radio', 'the life jackets'], a: 2, why: `The radio was still there, tuned to the distress frequency.` }
+      ]
+    },
+    { t: 'details', sum: 'Show the transcript (for checking after you listen)', html: LESSON.scripts.joyita.map(function (p) { return '<p>' + p + '</p>'; }).join('') },
+    { t: 'qs', title: 'After listening', items: [`Which of the theories from the previous stage fits the Joyita best? Use <b>might have</b>, <b>must have</b> or <b>can't have</b>.`, `Why do you think the narrator uses the present tense (<i>slips out, is heading, sees</i>) for events in 1955? How does it feel?`] }
+  ]
+});
+
+/* 7 GRAMMAR */
+LESSON.stages.push({
+  id: 'grammar', nav: 'Grammar', title: 'Grammar: past tenses vs present tenses', min: 11,
+  desc: 'Choose the right tense for the story, the documentary and the theories.',
+  blocks: [
+    {
+      t: 'table', html: `<table class="tt"><thead><tr><th>Tense</th><th>Use it for</th><th>Example</th></tr></thead><tbody>
+<tr><td>Past Simple</td><td>finished events: the main line of the story</td><td class="eg">The Dei Gratia found the ship on 4 December.</td></tr>
+<tr><td>Past Continuous</td><td>background, or an action in progress when something happened</td><td class="eg">The sailors were sailing towards Portugal when they saw a ship.</td></tr>
+<tr><td>Past Perfect</td><td>an action before another past action</td><td class="eg">The crew had left before the Dei Gratia arrived.</td></tr>
+<tr><td>Past Perfect Continuous</td><td>a longer activity before a past moment, often the reason for what we see</td><td class="eg">The ship had been drifting for ten days.</td></tr>
+<tr><td>Present Simple</td><td>facts, theories, and the historic present in documentaries</td><td class="eg">Some experts believe that fumes caused an explosion. / The captain steps on deck.</td></tr>
+<tr><td>Present Continuous</td><td>a scene happening now, or a changing situation</td><td class="eg">A small boat is rowing towards the ship.</td></tr>
+<tr><td>Present Perfect</td><td>the past connected to now: results, experience, <i>so far, yet, ever, never, since, for</i></td><td class="eg">Nobody has ever explained what happened.</td></tr>
+<tr><td>Present Perfect Continuous</td><td>an activity that started in the past and continues, or has just stopped</td><td class="eg">Researchers have been looking for the Baychimo since 2006.</td></tr>
+</tbody></table>`
+    },
+    { t: 'note', html: `<h3>Two contrasts to remember</h3><ul><li><b>Past Simple vs Present Perfect.</b> A finished time (<i>in 1872, last night, ago</i>) needs the Past Simple. An unfinished time or no time (<i>this year, so far, ever, since</i>) needs the Present Perfect. <span class="eg">The ship was found in 1872. The ship has been famous for over 150 years.</span></li><li><b>Narration.</b> To tell a story that happened, use past tenses. Documentaries and jokes often use the present (the <i>historic present</i>) to make the past feel close: <span class="eg">The captain steps aboard. He sees nobody.</span></li></ul>` },
+    {
+      t: 'ex', id: 'g1', kind: 'mcq', tag: 'Core', title: 'Choose the correct tense',
+      items: [
+        { q: `By the time the Dei Gratia arrived, the crew ___ the ship.`, o: ['left', 'had left', 'were leaving', 'have left'], a: 1, why: `The crew left first, then the Dei Gratia arrived. The earlier action takes the Past Perfect.` },
+        { q: `The sailors ___ across the Atlantic when they noticed a strange ship.`, o: ['sailed', 'were sailing', 'had sailed', 'sail'], a: 1, why: `An action in progress when another action happened: Past Continuous.` },
+        { q: `For over 150 years nobody ___ what happened to the crew.`, o: ['explained', 'was explaining', 'has explained', 'had been explained'], a: 2, why: `<i>For over 150 years</i> reaches the present, so we use the Present Perfect.` },
+        { q: `The Baychimo ___ for years when a group of Inuit finally saw her again.`, o: ['was drifting', 'had been drifting', 'drifted', 'has been drifting'], a: 1, why: `A long activity before a past moment: Past Perfect Continuous.` },
+        { q: `Researchers ___ the wreck of the Baychimo since 2006.`, o: ['look for', 'looked for', 'have been looking for', 'had looked for'], a: 2, why: `<i>Since 2006</i> and the search is still going: Present Perfect Continuous.` },
+        { q: `In the documentary the captain ___ the deck, opens the cabin door and finds the table already set.`, o: ['walks', 'walked', 'has walked', 'was walking'], a: 0, why: `The other verbs are in the present (<i>opens, finds</i>): this is the historic present.` },
+        { q: `Joyita ___ Apia at five o'clock on 3 October 1955.`, o: ['has left', 'left', 'has been leaving', 'had left'], a: 1, why: `A finished time in the past (<i>on 3 October 1955</i>): Past Simple.` },
+        { q: `I ___ a lot of documentaries about ghost ships this year.`, o: ['watched', 'have watched', 'was watching', 'had watched'], a: 1, why: `<i>This year</i> is not finished, so we use the Present Perfect.` }
+      ]
+    },
+    {
+      t: 'ex', id: 'g2', kind: 'cloze', tag: 'Core', title: 'Past tenses: the last night of the Esperanza',
+      instr: 'Put the verb in brackets into the correct past tense.',
+      text: `<p>On the night of 24 November the crew of the <i>Esperanza</i> {{1}} cards in the galley when the lamp suddenly {{2}} out. The captain, who {{3}} uneasy for days, {{4}} on deck. The sea {{5}} calm, but a strange green light {{6}} under the water. By the time the sailors {{7}} the lifeboat, the light {{8}}.</p>`,
+      gaps: {
+        1: { a: ['were playing'], lab: '(play)', why: `Past Continuous: they were in the middle of the game when the lamp went out.` },
+        2: { a: ['went'], lab: '(go)', why: `Past Simple: a sudden event that interrupted the game.` },
+        3: { a: ['had already been feeling', 'had already felt', 'had been feeling', 'had felt'], lab: '(already / feel)', why: `Past Perfect (Continuous): he felt uneasy before that night, for days.` },
+        4: { a: ['ran'], lab: '(run)', why: `Past Simple: a main event in the story.` },
+        5: { a: ['was'], lab: '(be)', why: `Past Simple: description of the situation.` },
+        6: { a: ['was shining'], lab: '(shine)', why: `Past Continuous: background action, a light that was shining at that moment.` },
+        7: { a: ['reached'], lab: '(reach)', why: `<i>By the time</i> + Past Simple.` },
+        8: { a: ['had disappeared'], lab: '(disappear)', why: `Past Perfect: the light went before they arrived.` }
+      }
+    },
+    {
+      t: 'ex', id: 'g3', kind: 'cloze', tag: 'Extra', title: 'Present tenses: the documentary voice-over',
+      instr: 'Put the verb in brackets into the correct present tense.',
+      text: `<p>Today the Mary Celeste {{1}} one of the most famous mysteries at sea. Historians {{2}} the case since 1872, and they {{3}} any final answer yet. Now the documentary {{4}} us back to that December morning. At this very moment a small boat {{5}} towards a silent ship. A sailor {{6}} aboard, {{7}} round and {{8}} an empty deck.</p>`,
+      gaps: {
+        1: { a: ['remains'], lab: '(remain)', why: `Present Simple: a general fact about now.` },
+        2: { a: ['have been studying', 'have studied'], lab: '(study)', why: `<i>Since 1872</i> up to now: Present Perfect (Continuous).` },
+        3: { a: ['have not reached'], lab: '(not / reach)', hint: 'Use the Present Perfect with <i>yet</i>.', why: `<i>Yet</i> goes with the Present Perfect: <i>have not reached</i>.` },
+        4: { a: ['takes'], lab: '(take)', why: `Present Simple: the narrator describes what the film does.` },
+        5: { a: ['is rowing'], lab: '(row)', why: `Present Continuous: <i>at this very moment</i>.` },
+        6: { a: ['climbs'], lab: '(climb)', why: `Historic present: the past told as if it is happening now.` },
+        7: { a: ['looks'], lab: '(look)', why: `Historic present, same style as the other verbs.` },
+        8: { a: ['finds'], lab: '(find)', why: `Historic present again.` }
+      }
+    },
+    {
+      t: 'ex', id: 'g4', kind: 'mcq', tag: 'Extra', title: 'Alien theory: mixed tenses',
+      instr: 'Documentaries love the idea of alien visitors. Choose the correct tense.',
+      items: [
+        { q: `UFO fans claim that aliens ___ people from ships since ancient times.`, o: ['take', 'took', 'have been taking', 'had taken'], a: 2, why: `<i>Since ancient times</i> up to now: Present Perfect Continuous.` },
+        { q: `Every time a ship disappears, someone ___ that aliens are responsible.`, o: ['suggested', 'has suggested', 'suggests', 'is suggesting'], a: 2, why: `<i>Every time</i> shows a repeated habit: Present Simple.` },
+        { q: `Last night I ___ a documentary about the Bermuda Triangle, so now I can't sleep.`, o: ['watched', 'was watching', 'have watched', 'had watched'], a: 0, why: `<i>Last night</i> is a finished time: Past Simple.` },
+        { q: `While the crew ___ the strange light, the ship suddenly began to shake.`, o: ['watched', 'were watching', 'had watched', 'watch'], a: 1, why: `A longer action in progress, interrupted by a shorter one: Past Continuous.` },
+        { q: `By the time the rescuers arrived, the strange light ___.`, o: ['has gone', 'had gone', 'was going', 'goes'], a: 1, why: `The light went before the rescuers came: Past Perfect.` },
+        { q: `“Right now, a strange light ___ over the sea,” says the narrator.`, o: ['hangs', 'is hanging', 'has hung', 'hung'], a: 1, why: `<i>Right now</i> describes a scene happening at this moment: Present Continuous.` }
+      ]
+    }
+  ]
+});
+
+/* 8 USE OF ENGLISH */
+LESSON.stages.push({
+  id: 'uoe', nav: 'Use of English', title: 'FCE Reading and Use of English, Parts 1–4', min: 11,
+  desc: 'Multiple-choice cloze, open cloze, word formation and key word transformations.',
+  blocks: [
+    { t: 'html', html: `<p>Four tasks in the style of the First exam. Parts 1 and 2 are the core. Parts 3 and 4 can be homework.</p>` },
+    {
+      t: 'ex', id: 'p1', kind: 'cloze', tag: 'Part 1 · Core', title: 'Part 1: multiple-choice cloze',
+      instr: 'For questions 1–8, read the text and decide which word best fits each gap.',
+      text: `<p>The Flying Dutchman is <span class="kw">0 perhaps</span> the most famous ghost ship of all. According to the legend, a Dutch captain once {{1}} a terrible oath, promising to sail round the Cape of Good Hope even if it took him until the end of time. His wish was {{2}}, and the ship has been sailing the seas {{3}} then.</p><p>Sailors say that the ship is sometimes seen in stormy weather, with a strange light {{4}} from its masts. Seeing it is said to {{5}} terrible luck. Of course, scientists {{6}} that the sight can be explained by a mirage, a trick of the light that can make a distant ship seem to float in the sky. Even so, the story has {{7}} writers and film-makers for centuries, and people {{8}} to enjoy it today.</p>`,
+      gaps: {
+        1: { o: ['made', 'took', 'had', 'did'], a: 1, why: `The collocation is <i>take an oath</i>.` },
+        2: { o: ['allowed', 'granted', 'accepted', 'given'], a: 1, why: `A wish is <i>granted</i>.` },
+        3: { o: ['since', 'from', 'after', 'for'], a: 0, why: `<i>Since then</i> goes with the Present Perfect (<i>has been sailing</i>).` },
+        4: { o: ['spreading', 'shining', 'putting', 'showing'], a: 1, why: `A light <i>shining</i> from the masts.` },
+        5: { o: ['bring', 'take', 'make', 'turn'], a: 0, why: `The collocation is <i>bring (bad) luck</i>.` },
+        6: { o: ['convince', 'persuade', 'point out', 'tell'], a: 2, why: `<i>Point out that</i> + clause. <i>Convince, persuade</i> and <i>tell</i> need a person after them.` },
+        7: { o: ['inspired', 'encouraged', 'persuaded', 'imagined'], a: 0, why: `Stories <i>inspire</i> writers and film-makers.` },
+        8: { o: ['continue', 'remain', 'keep', 'last'], a: 0, why: `<i>Continue to enjoy</i>. <i>Keep</i> would need <i>enjoying</i>.` }
+      }
+    },
+    {
+      t: 'ex', id: 'p2', kind: 'cloze', tag: 'Part 2 · Core', title: 'Part 2: open cloze',
+      instr: 'For questions 9–16, think of the word which best fits each gap. Use only one word in each gap.',
+      text: `<p>Arthur Conan Doyle, the author <span class="kw">0 of</span> Sherlock Holmes, worked as a ship's doctor when he was young. In 1884 he wrote a short story {{9}} a ship called the Marie Celeste. {{10}} it was fiction, many readers believed {{11}} to be a true account, and some even confused the invented details {{12}} the real case. The story was so popular {{13}} the real ship's name is still often spelled wrongly, {{14}} Doyle spelled it. His tale was full {{15}} terrible murders and strange characters, {{16}} the real mystery has no such villains, only questions.</p>`,
+      gaps: {
+        9: { a: ['about'], why: `A story <i>about</i> a ship.` },
+        10: { a: ['although', 'though', 'while', 'whilst'], why: `A contrast between <i>fiction</i> and what readers believed: <i>although</i>.` },
+        11: { a: ['it'], why: `<i>Believed it to be</i>: the object of <i>believed</i> is the story.` },
+        12: { a: ['with'], why: `You <i>confuse</i> one thing <i>with</i> another.` },
+        13: { a: ['that'], why: `<i>So popular that</i> + result.` },
+        14: { a: ['as'], why: `<i>As Doyle spelled it</i>: in the same way as.` },
+        15: { a: ['of'], why: `<i>Full of</i> + noun.` },
+        16: { a: ['but', 'whereas', 'while', 'yet'], why: `A contrast between the story and the real mystery.` }
+      }
+    },
+    {
+      t: 'ex', id: 'p3', kind: 'cloze', tag: 'Part 3 · Extra', title: 'Part 3: word formation',
+      instr: 'For questions 17–24, use the word in capitals after the gap to form a word that fits.',
+      text: `<p>An empty ship drifting at sea is a <span class="kw">0 disturbing</span> sight. Most sea captains are {{17}} people who rarely believe in ghosts, yet even they feel {{18}} when they climb aboard a ship with nobody on deck. The {{19}} of the Mary Celeste's crew has never been explained. Some experts believe that the captain made a sudden {{20}} to leave the ship, and that the crew was {{21}} by the smell of alcohol. Today many people still prefer a more {{22}} explanation, such as alien visitors, but there is no {{23}} evidence for this. Whatever the truth, the {{24}} of ghost-ship stories shows no sign of fading.</p>`,
+      gaps: {
+        17: { a: ['practical'], lab: 'PRACTICE', why: `Adjective: practice → practical.` },
+        18: { a: ['uncomfortable'], lab: 'COMFORT', why: `After <i>feel</i> we need an adjective, and the meaning is negative: un- + comfort + -able.` },
+        19: { a: ['disappearance'], lab: 'APPEAR', why: `A noun after <i>the</i>: dis- + appear + -ance.` },
+        20: { a: ['decision'], lab: 'DECIDE', why: `After <i>a sudden</i> we need a noun: decide → decision.` },
+        21: { a: ['frightened'], lab: 'FRIGHT', why: `The crew <i>was frightened</i>: a participle adjective for the feeling.` },
+        22: { a: ['mysterious'], lab: 'MYSTERY', why: `Adjective before <i>explanation</i>: mystery → mysterious.` },
+        23: { a: ['reliable'], lab: 'RELY', why: `Adjective before <i>evidence</i>: rely → reliable.` },
+        24: { a: ['popularity'], lab: 'POPULAR', why: `A noun after <i>the</i>: popular → popularity.` }
+      }
+    },
+    {
+      t: 'ex', id: 'p4', kind: 'kwt', tag: 'Part 4 · Extra', title: 'Part 4: key word transformation',
+      instr: 'For questions 25–30, complete the second sentence so that it has a similar meaning to the first. Use the word given. Do not change it. Use between two and five words, including the word given.',
+      example: { first: 'People think the ship is cursed.', key: 'THOUGHT', start: 'The ship', ans: 'is thought to be', end: 'cursed.' },
+      items: [
+        { n: 25, first: 'The captain left the ship before the storm began.', key: 'HAD', start: 'By the time the storm began, the captain', end: 'the ship.', a: ['had already left', 'had left'], why: `The captain left first, so we need the Past Perfect: <i>had already left</i>.` },
+        { n: 26, first: 'They started looking for the ghost ship in 2006.', key: 'BEEN', start: 'They', end: 'the ghost ship since 2006.', a: ['have been looking for'], why: `<i>Since 2006</i> and still searching: <i>have been looking for</i>.` },
+        { n: 27, first: 'A local company cleaned the ship’s hull last week.', key: 'HAD', start: 'The captain', end: 'cleaned by a local company last week.', a: ['had the hull', 'had the ship’s hull', 'had the ship\'s hull'], why: `The causative: <i>had the hull cleaned</i>.` },
+        { n: 28, first: 'I have never seen such a strange ship before.', key: 'FIRST', start: 'This is', end: 'I have seen such a strange ship.', a: ['the first time'], why: `<i>This is the first time</i> + Present Perfect.` },
+        { n: 29, first: 'Nobody has seen the ship since 1969.', key: 'LAST', start: 'The ship', end: 'in 1969.', a: ['was last seen'], why: `Passive Past Simple with <i>last</i>: <i>was last seen</i>.` },
+        { n: 30, first: '“Did the crew take the lifeboat?” the inspector asked.', key: 'IF', start: 'The inspector asked', end: 'the lifeboat.', a: ['if the crew had taken', 'if the crew took'], why: `Reported question: <i>if</i> + subject + verb, one tense back.` }
+      ]
+    }
+  ]
+});
+
+/* 9 COLLOCATIONS AND PHRASAL VERBS */
+LESSON.stages.push({
+  id: 'colloc', nav: 'Collocations', title: 'Collocations and phrasal verbs', min: 6,
+  desc: 'Words that go together at sea, and ten phrasal verbs from the stories.',
+  blocks: [
+    {
+      t: 'ex', id: 'c1', kind: 'gap', tag: 'Core', title: 'Sea collocations',
+      instr: 'Write one word in each gap.',
+      items: [
+        { q: `The ship will ___ sail at dawn.`, a: ['set'], why: `<i>Set sail</i> means to begin a journey by ship.` },
+        { q: `Sailors ___ anchor when they reach the harbour.`, a: ['drop', 'cast'], why: `<i>Drop anchor</i> (or <i>cast anchor</i>) means to lower the anchor.` },
+        { q: `In thick fog the boat ran ___ on the rocks.`, a: ['aground'], why: `<i>Run aground</i> means to hit the bottom or the shore by accident.` },
+        { q: `The ship sank without a ___, and nothing was ever found.`, a: ['trace'], why: `<i>Without a trace</i>: leaving no sign at all.` },
+        { q: `The lookout saw smoke and quickly raised the ___.`, a: ['alarm'], why: `You <i>raise the alarm</i> to warn people of danger.` },
+        { q: `It remains an unsolved ___.`, a: ['mystery'], why: `<i>Unsolved mystery</i> is a very common pair.` },
+        { q: `A thick ___ covered the sea, so nobody could see the lights.`, a: ['fog'], why: `We say <i>thick fog</i>, not <i>strong fog</i>.` },
+        { q: `When the fire spread, everyone had to ___ to the lifeboats.`, a: ['take'], why: `<i>Take to the lifeboats</i> means to leave a ship in the lifeboats.` }
+      ]
+    },
+    {
+      t: 'ex', id: 'pv', kind: 'gap', tag: 'Core', title: 'Phrasal verbs',
+      instr: 'Complete each sentence with a phrasal verb from the box. Change the form if you need to.',
+      bank: ['set off', 'make out', 'wash up', 'track down', 'take on', 'go down', 'pick up', 'turn up', 'close in', 'put forward'],
+      items: [
+        { q: `At dawn the crew ___ for Genoa.`, a: ['set off'], why: `<i>Set off</i> means to start a journey. Past Simple: <i>set off</i>.` },
+        { q: `Through the fog, the sailors could just ___ the shape of a ship.`, a: ['make out'], why: `<i>Make out</i> means to see or hear with difficulty.` },
+        { q: `Pieces of wood from the wreck ___ on the beach weeks later.`, a: ['washed up'], why: `<i>Wash up</i> means to be carried onto the shore by the sea.` },
+        { q: `Journalists finally ___ the captain's grandson.`, a: ['tracked down'], why: `<i>Track down</i> means to find after a long search.` },
+        { q: `When the ship began to ___ water, the crew grabbed the buckets.`, a: ['take on'], why: `A ship that <i>takes on</i> water is filling with it.` },
+        { q: `The old boat ___ in a few minutes.`, a: ['went down'], why: `<i>Go down</i> means to sink.` },
+        { q: `The radio operator ___ a weak distress signal.`, a: ['picked up'], why: `<i>Pick up</i> a signal means to receive it.` },
+        { q: `A cargo ship ___ unexpectedly and offered to tow the boat.`, a: ['turned up'], why: `<i>Turn up</i> means to appear, often unexpectedly.` },
+        { q: `The ice ___ around the ship and nobody could leave.`, a: ['closed in'], why: `<i>Close in</i> means to come nearer from all sides.` },
+        { q: `Some experts ___ a new theory last year.`, a: ['put forward'], why: `<i>Put forward</i> a theory means to suggest it.` }
+      ]
+    }
+  ]
+});
+
+/* 10 SPEAKING */
+LESSON.stages.push({
+  id: 'speak', nav: 'Speaking', title: 'Speaking: your theory', min: 3,
+  desc: 'Choose a ship, defend a theory and answer follow-up questions.',
+  blocks: [
+    { t: 'html', html: `<p class="lede">Choose one ship and one theory. Speak for one minute: say what happened and why you think so.</p>` },
+    { t: 'note', html: `<h3>Useful language</h3><p><b>Giving a theory:</b> I'm convinced that… / It might have been… / The most likely explanation is…<br><b>Giving evidence:</b> The fact that… suggests… / What strikes me is…<br><b>Disagreeing politely:</b> That's possible, but… / On the other hand… / I can't see why…</p>` },
+    {
+      t: 'qs', title: 'Follow-up questions', items: [
+        `Do you believe that a real ghost ship could exist? Why or why not?`,
+        `Which story did you find stranger, the Mary Celeste or the Baychimo? Why?`,
+        `Would you go aboard an abandoned ship? What would you be afraid of?`,
+        `Why do stories about ghost ships still fascinate us after more than a hundred years?`,
+        `Tell me about a place that felt eerie to you. What happened? (Use past tenses.)`
+      ]
+    }
+  ]
+});
+
+/* 11 DICTATION */
+LESSON.stages.push({
+  id: 'dict', nav: 'Dictation', title: 'Dictation: the lighthouse keeper', min: 5,
+  desc: 'Listen, type what you hear and check your accuracy.',
+  blocks: [
+    { t: 'html', html: `<p class="lede">A short story to warm up your ear and your tenses before you write your own.</p>` },
+    { t: 'dictation', audio: 'media/dictation.mp3', text: LESSON.scripts.dictation.join('\n') }
+  ]
+});
+
+/* 12 WRITE */
+LESSON.stages.push({
+  id: 'write', nav: 'Write', title: 'Write your own ghost-ship story', min: 10,
+  desc: 'Plan, write, check and save your story as a Word file.',
+  blocks: [
+    { t: 'html', html: `<p>This is a First-style story task. Choose one of the three tasks, plan it and write 140–190 words. Use past tenses for the story. You may use the present in dialogue.</p>` },
+    {
+      t: 'write',
+      prompts: [
+        `Write a story that begins: <b>I had never believed in ghost ships until the night we found the Silver Gull drifting in the fog.</b>`,
+        `Write a story that ends: <b>…and from that day on, nobody ever sailed that way again.</b>`,
+        `Write a story with the title <b>The Last Entry in the Log</b>. A ship is found with nobody on board.`
+      ],
+      plan: [
+        ['Beginning: who, where, when?', 'e.g. night, fog, small fishing boat, me and my dad'],
+        ['Problem: what is strange?', 'e.g. a ship with no lights, a bell ringing'],
+        ['Climax: what do they find or do?', 'e.g. an empty deck, a warm cup, a log still being written'],
+        ['Ending: how does it finish?', 'e.g. the ship disappears, a question stays unanswered']
+      ],
+      checks: [
+        'I used at least three different past tenses (Past Simple, Past Continuous, Past Perfect).',
+        'I included one piece of speculation (must have, might have, can’t have).',
+        'I used at least three words from this lesson (for example adrift, hull, eerie, vanish).',
+        'I used at least two collocations (for example set sail, drop anchor, run aground).',
+        'I used one phrasal verb (for example make out, set off, pick up).',
+        'I used time linkers (suddenly, meanwhile, by the time, as soon as, in the end).',
+        'My story has a clear beginning, a problem and an ending.',
+        'I read it again and checked spelling, tenses and punctuation.'
+      ],
+      model: `<h4 style="margin:0 0 6px">Model plan</h4><ul><li><b>Beginning:</b> foggy evening, I am with Dad and my brother on the way home from fishing.</li><li><b>Problem:</b> a tall ship with no lights appears in the mist.</li><li><b>Climax:</b> Dad climbs aboard and finds a warm cup, an open radio and a fresh entry in the log.</li><li><b>Ending:</b> the fog swallows the ship; I still wonder who was writing.</li></ul>
+<h4 style="margin:14px 0 6px">Model story (about 170 words)</h4><div class="model">
+<p>I <mark>had never believed</mark> in ghost ships until the night we found the <i>Silver Gull</i> drifting in the fog. We were returning from a fishing trip and the engine <mark>was running</mark> badly, so Dad was already in a bad mood. Then, through the mist, I <mark>made out</mark> a tall shape with no lights.</p>
+<p>“Nobody is on deck,” my brother whispered. We came alongside and Dad climbed aboard with a torch. The cabin door was open, and on the table a cup of tea was still warm. The lifeboat <mark>had gone</mark>, and the radio was crackling on the emergency channel.</p>
+<p>We searched every corner, but there was no one. “They <mark>must have left</mark> in a hurry,” Dad said, but his voice was shaking. <mark>While</mark> he <mark>was checking</mark> the logbook, I noticed that the last entry <mark>had been written</mark> only an hour earlier.</p>
+<p><mark>By the time</mark> we got back to our boat, the fog <mark>had swallowed</mark> the <i>Silver Gull</i>. We reported it to the coastguard, who found nothing. To this day I wonder who <mark>had been writing</mark> in that log.</p></div>
+<p class="eg">Highlighted: past tenses, speculation, a phrasal verb and a time linker.</p>`
+    },
+    { t: 'note', html: `<h3>Homework</h3><ul><li>Finish your story and save it as a Word file.</li><li>Do Parts 3 and 4 of Use of English and the Extra grammar exercises.</li><li>Learn the ten phrasal verbs and eight collocations. Write five sentences of your own.</li></ul>` }
+  ]
+});
+
+
+</script>
+<script>
+(function () {
+'use strict';
+var L = window.LESSON;
+var TEACHER = /teacher/.test(location.hash);
+
+/* ---------- helpers ---------- */
+function el(tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function sget(k) { try { return localStorage.getItem('gs_' + k); } catch (e) { return null; } }
+function sset(k, v) { try { localStorage.setItem('gs_' + k, v); } catch (e) {} }
+function btn(txt, cls, fn) { var b = el('button', 'btn ' + (cls || ''), txt); b.type = 'button'; if (fn) b.onclick = fn; return b; }
+var LET = 'ABCDEFGHIJKLMNOP';
+function norm(s) {
+  return String(s == null ? '' : s).toLowerCase().replace(/[’‘`]/g, "'")
+    .replace(/won't/g, 'will not').replace(/can't/g, 'cannot').replace(/n't/g, ' not').replace(/'ve/g, ' have')
+    .replace(/[:.,;!?]/g, '').replace(/\s+/g, ' ').trim();
+}
+function isOk(it, v) { var n = norm(v); return it.a.some(function (a) { return norm(a) === n; }); }
+function sizeFor(answers) { var m = 6; answers.forEach(function (a) { m = Math.max(m, String(a).length + 2); }); return Math.min(m, 30); }
+function mkInput(answers) {
+  var i = el('input', 'in'); i.type = 'text'; i.autocomplete = 'off'; i.autocapitalize = 'off'; i.spellcheck = false; i.size = sizeFor(answers);
+  return i;
+}
+
+/* ---------- saving files (viewer download capability, with fallback) ---------- */
+function saveBlob(name, blob, statusEl) {
+  function say(t) { if (statusEl) statusEl.textContent = t; }
+  function fallback() {
+    try {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name;
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      say('Saved as ' + name + ' (check your Downloads folder).');
+    } catch (e) { say('Saving is not available here. Use "Copy text" and paste into Word.'); }
+  }
+  var p = (window.claude && window.claude.use) ? window.claude.use('downloads') : Promise.resolve(null);
+  p.then(function (dl) {
+    if (!dl) { fallback(); return; }
+    dl.save({ filename: name, data: blob }).then(function () { say('Saved as ' + name + '.'); })
+      .catch(function (e) {
+        if (e && e.code === 'declined') say('Save cancelled.');
+        else say('Saving is not available here. Use "Copy text" and paste into Word.');
+      });
+  }).catch(fallback);
+}
+function copyText(text, statusEl) {
+  function say(t) { if (statusEl) statusEl.textContent = t; }
+  function sel() { say('Copy blocked. Select the text in the box and press Ctrl+C.'); }
+  try { navigator.clipboard.writeText(text).then(function () { say('Copied. Paste it into Word.'); }, sel); } catch (e) { sel(); }
+}
+
+/* minimal .docx writer (stored zip) */
+function crc32(buf) {
+  var t = crc32.t;
+  if (!t) { t = crc32.t = []; for (var n = 0; n < 256; n++) { var c = n; for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } }
+  var crc = -1; for (var i = 0; i < buf.length; i++) crc = t[(crc ^ buf[i]) & 255] ^ (crc >>> 8);
+  return (crc ^ -1) >>> 0;
+}
+function zipStore(files) {
+  var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+  files.forEach(function (f) {
+    var nameB = enc.encode(f.name), data = enc.encode(f.text), crc = crc32(data), size = data.length;
+    var lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+    lh.setUint16(10, 0, true); lh.setUint16(12, 0x21, true); lh.setUint32(14, crc, true);
+    lh.setUint32(18, size, true); lh.setUint32(22, size, true); lh.setUint16(26, nameB.length, true);
+    parts.push(new Uint8Array(lh.buffer), nameB, data);
+    var ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true);
+    ch.setUint16(14, 0x21, true); ch.setUint32(16, crc, true); ch.setUint32(20, size, true); ch.setUint32(24, size, true);
+    ch.setUint16(28, nameB.length, true); ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), nameB);
+    offset += 30 + nameB.length + size;
+  });
+  var cd = 0; central.forEach(function (c) { cd += c.length; });
+  var end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+  end.setUint32(12, cd, true); end.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [new Uint8Array(end.buffer)]), { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
+function xmlEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''); }
+function makeDocx(paras) {
+  var body = paras.map(function (p) {
+    var rpr = '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>' + (p.bold ? '<w:b/>' : '') + (p.italic ? '<w:i/>' : '') + '<w:sz w:val="' + (p.size || 24) + '"/>';
+    return '<w:p><w:pPr><w:spacing w:after="' + (p.after == null ? 160 : p.after) + '" w:line="360" w:lineRule="auto"/></w:pPr><w:r><w:rPr>' + rpr + '</w:rPr><w:t xml:space="preserve">' + xmlEsc(p.text) + '</w:t></w:r></w:p>';
+  }).join('');
+  var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body +
+    '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>';
+  var ct = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>';
+  var rels = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>';
+  return zipStore([{ name: '[Content_Types].xml', text: ct }, { name: '_rels/.rels', text: rels }, { name: 'word/document.xml', text: doc }]);
+}
+function textToParas(text) { return text.split(/\n+/).filter(function (x) { return x.trim(); }).map(function (x) { return { text: x.trim() }; }); }
+function wordCount(t) { var m = t.trim().match(/\S+/g); return m ? m.length : 0; }
+window.__gs = { norm: norm, makeDocx: makeDocx, wordCount: wordCount };
+
+/* ---------- exercise kinds ---------- */
+var KINDS = {};
+
+function choiceKind(labels, key) {
+  return function (ex, body, upd) {
+    var items = [];
+    ex.items.forEach(function (it, i) {
+      var card = el('div', 'item');
+      card.appendChild(el('p', 'q', '<span class="n">' + (i + 1) + '</span>' + it.q));
+      var opts = el('div', 'opts' + (labels ? ' row' : ''));
+      var fb = el('div', 'fb'); fb.hidden = true;
+      var opt = labels || it.o, correct = labels ? { T: 0, F: 1, NG: 2 }[it.a] : it.a, btns = [], st = { v: null };
+      function show(good, shown) {
+        btns.forEach(function (x) { x.disabled = true; });
+        btns[correct].classList.add('ok');
+        fb.className = 'fb ' + (shown ? 'ok' : good ? 'ok' : 'bad');
+        fb.innerHTML = '<b>' + (shown ? 'Answer. ' : good ? 'Correct. ' : 'Not quite. ') + '</b>' + it.why; fb.hidden = false;
+      }
+      opt.forEach(function (t, j) {
+        var b = el('button', 'opt', '<span class="l">' + (labels ? t.charAt(0) : LET[j]) + '</span><span>' + t + '</span>'); b.type = 'button'; btns.push(b);
+        b.onclick = function () {
+          if (st.v !== null) return;
+          st.v = j === correct ? 1 : 0; show(st.v === 1, false);
+          if (!st.v) b.classList.add('bad');
+          upd();
+        };
+        opts.appendChild(b);
+      });
+      card.appendChild(opts); card.appendChild(fb); body.appendChild(card);
+      items.push({
+        state: function () { return st.v === 2 ? null : st.v; },
+        reveal: function () { if (st.v === null) { st.v = 2; show(true, true); } }
+      });
+    });
+    return { items: items, checkable: false };
+  };
+}
+KINDS.mcq = choiceKind(null);
+KINDS.tfng = choiceKind(['True', 'False', 'Not Given']);
+
+KINDS.match = function (ex, body, upd) {
+  var defs = el('div', 'defs');
+  ex.defs.forEach(function (d, i) { defs.appendChild(el('div', null, '<b>' + LET[i] + '</b>' + d)); });
+  body.appendChild(defs);
+  var items = [], tries = 0;
+  ex.items.forEach(function (it, i) {
+    var row = el('div', 'matchrow'); row.appendChild(el('span', 'w', (i + 1) + '. ' + it.q));
+    var sel = el('select', 'in'); sel.appendChild(new Option('—', ''));
+    ex.defs.forEach(function (d, j) { sel.appendChild(new Option(LET[j], j)); });
+    sel.setAttribute('aria-label', 'Meaning of ' + it.q);
+    var mk = el('span', 'mk', ''); row.appendChild(sel); row.appendChild(mk); body.appendChild(row);
+    var st = { v: null };
+    function paint(final) {
+      if (sel.value === '') { if (final) { st.v = 0; sel.className = 'in bad'; mk.textContent = 'Answer: ' + LET[it.a]; } return; }
+      var good = +sel.value === it.a;
+      if (good) { st.v = 1; sel.className = 'in ok'; mk.textContent = '✓'; }
+      else if (final) { st.v = 0; sel.className = 'in bad'; mk.textContent = '✗ Answer: ' + LET[it.a]; }
+      else { st.v = null; sel.className = 'in bad'; mk.textContent = '✗'; }
+    }
+    items.push({
+      state: function () { return st.v; },
+      paint: paint,
+      reveal: function () { sel.value = it.a; sel.className = 'in ok'; mk.textContent = '✓ ' + LET[it.a]; st.v = null; }
+    });
+  });
+  return { items: items, checkable: true, checkAll: function () { tries++; items.forEach(function (x) { x.paint(tries >= 2); }); } };
+};
+
+KINDS.gap = function (ex, body, upd) {
+  var items = [];
+  if (ex.bank) body.appendChild(el('div', 'bank', ex.bank.map(function (w) { return '<span>' + w + '</span>'; }).join('')));
+  ex.items.forEach(function (it, i) {
+    var card = el('div', 'item');
+    var p = el('p', 'q', '<span class="n">' + (i + 1) + '</span>' + it.q.replace('___', '<span class="slot"></span>'));
+    var inp = mkInput(it.a); inp.setAttribute('aria-label', 'Answer ' + (i + 1));
+    p.querySelector('.slot').replaceWith(inp);
+    if (it.lab) inp.insertAdjacentHTML('afterend', '<span class="lab">' + it.lab + '</span>');
+    var fb = el('div', 'fb'); fb.hidden = true;
+    var st = { v: null, tries: 0 };
+    function chk() {
+      if (!inp.value.trim()) return;
+      if (st.v === 1 || st.v === 0) return;
+      if (isOk(it, inp.value)) { st.v = 1; inp.className = 'in ok'; fb.className = 'fb ok'; fb.innerHTML = '<b>Correct.</b> ' + (it.why || ''); }
+      else {
+        st.tries++;
+        if (st.tries < 2) { inp.className = 'in bad'; fb.className = 'fb bad'; fb.innerHTML = '<b>Not quite.</b> ' + (it.hint || 'Check the word and its form, then try once more.'); }
+        else { st.v = 0; inp.className = 'in bad'; fb.className = 'fb bad'; fb.innerHTML = '<b>Answer: ' + esc(it.a[0]) + '.</b> ' + (it.why || ''); }
+      }
+      fb.hidden = false; upd();
+    }
+    inp.onkeydown = function (e) { if (e.key === 'Enter') chk(); };
+    var cb = btn('Check', 'ghost sm', chk);
+    card.appendChild(p); card.appendChild(cb); card.appendChild(fb); body.appendChild(card);
+    items.push({
+      state: function () { return st.v; }, check: chk,
+      reveal: function () { if (st.v === null) { inp.value = it.a[0]; inp.className = 'in ok'; fb.className = 'fb ok'; fb.innerHTML = '<b>Answer.</b> ' + (it.why || ''); fb.hidden = false; st.v = 2; } }
+    });
+    items[items.length - 1].state = function () { return st.v === 2 ? null : st.v; };
+  });
+  return { items: items, checkable: true, checkAll: function () { items.forEach(function (x) { x.check(); }); } };
+};
+
+KINDS.kwt = function (ex, body, upd) {
+  var items = [];
+  function line(it) { return esc(it.start || '') + ' <span class="slot"></span> ' + esc(it.end || ''); }
+  if (ex.example) {
+    var e = ex.example;
+    body.appendChild(el('div', 'note', '<b>Example</b><br>0 &nbsp;' + esc(e.first) + '<br><span class="kw">' + e.key + '</span><br>' + esc(e.start) + ' <b>' + esc(e.ans) + '</b> ' + esc(e.end)));
+  }
+  ex.items.forEach(function (it, i) {
+    var card = el('div', 'item');
+    card.appendChild(el('p', 'q', '<span class="n">' + (it.n || i + 1) + '</span>' + esc(it.first)));
+    card.appendChild(el('p', null, '<span class="kw">' + it.key + '</span>'));
+    var ln = el('p', 'kwline', line(it));
+    var inp = el('input', 'in'); inp.type = 'text'; inp.autocomplete = 'off'; inp.autocapitalize = 'off'; inp.spellcheck = false;
+    inp.setAttribute('aria-label', 'Gap, two to five words');
+    ln.querySelector('.slot').replaceWith(inp);
+    var fb = el('div', 'fb'); fb.hidden = true; var st = { v: null, tries: 0 };
+    function chk() {
+      if (!inp.value.trim() || st.v === 1 || st.v === 0) return;
+      if (isOk(it, inp.value)) { st.v = 1; inp.className = 'in ok'; fb.className = 'fb ok'; fb.innerHTML = '<b>Correct.</b> ' + (it.why || ''); }
+      else {
+        st.tries++;
+        if (st.tries < 2) { inp.className = 'in bad'; fb.className = 'fb bad'; fb.innerHTML = '<b>Not quite.</b> ' + (it.hint || 'Use the key word without changing it. Use two to five words. Try once more.'); }
+        else { st.v = 0; inp.className = 'in bad'; fb.className = 'fb bad'; fb.innerHTML = '<b>Answer: ' + esc(it.a[0]) + '.</b> ' + (it.why || ''); }
+      }
+      fb.hidden = false; upd();
+    }
+    inp.onkeydown = function (ev) { if (ev.key === 'Enter') chk(); };
+    card.appendChild(ln); card.appendChild(btn('Check', 'ghost sm', chk)); card.appendChild(fb); body.appendChild(card);
+    items.push({
+      state: function () { return st.v === 2 ? null : st.v; }, check: chk,
+      reveal: function () { if (st.v === null) { inp.value = it.a[0]; inp.className = 'in ok'; fb.className = 'fb ok'; fb.innerHTML = '<b>Answer.</b> ' + (it.why || ''); fb.hidden = false; st.v = 2; } }
+    });
+  });
+  return { items: items, checkable: true, checkAll: function () { items.forEach(function (x) { x.check(); }); } };
+};
+
+KINDS.cloze = function (ex, body, upd) {
+  var wrap = el('div', 'cloze');
+  wrap.innerHTML = ex.text.replace(/\{\{(\d+)\}\}/g, function (m, n) { return '<span class="slot" data-n="' + n + '"></span>'; });
+  body.appendChild(wrap);
+  var expl = el('div', 'expl'); body.appendChild(expl);
+  var items = [], tries = 0;
+  Array.prototype.slice.call(wrap.querySelectorAll('.slot')).forEach(function (s) {
+    var n = s.getAttribute('data-n'), g = ex.gaps[n], ctl, st = { v: null };
+    var holder = document.createElement('span'); holder.innerHTML = '<span class="gn">(' + n + ')</span>';
+    if (g.o) { ctl = el('select', 'in'); ctl.appendChild(new Option('—', '')); g.o.forEach(function (t, j) { ctl.appendChild(new Option(LET[j] + '  ' + t, j)); }); }
+    else { ctl = mkInput(g.a); }
+    ctl.setAttribute('aria-label', 'Gap ' + n);
+    holder.appendChild(ctl); if (g.lab) holder.appendChild(el('span', 'lab', g.lab));
+    s.replaceWith(holder);
+    ctl.onkeydown = function (e) { if (e.key === 'Enter' && !g.o) api.checkAll(); };
+    function good() { return g.o ? (ctl.value !== '' && +ctl.value === g.a) : isOk(g, ctl.value); }
+    function ans() { return g.o ? LET[g.a] + '  ' + g.o[g.a] : g.a[0]; }
+    items.push({ n: n, g: g, ctl: ctl, st: st, good: good, ans: ans,
+      state: function () { return st.v === 2 ? null : st.v; },
+      reveal: function () { if (g.o) ctl.value = g.a; else ctl.value = g.a[0]; ctl.className = 'in ok'; st.v = 2; } });
+  });
+  function explain() {
+    expl.innerHTML = '';
+    items.forEach(function (x) {
+      var g1 = x.good();
+      expl.appendChild(el('div', g1 ? 'ok' : 'bad', '<b>' + x.n + '</b> ' + (g1 ? '✓ ' : '✗ ') + esc(x.ans()) + ' – ' + (x.g.why || '')));
+    });
+  }
+  var api = {
+    items: items, checkable: true,
+    checkAll: function () {
+      tries++;
+      var allGood = true;
+      items.forEach(function (x) {
+        var filled = x.ctl.value !== '' && String(x.ctl.value).trim() !== '';
+        var g1 = filled && x.good();
+        if (!g1) allGood = false;
+        x.ctl.className = 'in ' + (g1 ? 'ok' : (filled || tries >= 2) ? 'bad' : '');
+        x.st.v = g1 ? 1 : (tries >= 2 ? 0 : null);
+      });
+      if (allGood || tries >= 2) { items.forEach(function (x) { x.st.v = x.good() ? 1 : 0; }); explain(); }
+      else { expl.innerHTML = '<div class="bad">Some gaps are not right yet. Fix the red ones and press Check again to see the answers and explanations.</div>'; }
+      upd();
+    },
+    reveal: function () { items.forEach(function (x) { x.reveal(); }); explain(); }
+  };
+  return api;
+};
+
+function makeEx(ex) {
+  var box = el('section', 'ex');
+  if (ex.tag) box.appendChild(el('div', 'ex-tag', ex.tag));
+  box.appendChild(el('h3', null, ex.title));
+  if (ex.instr) box.appendChild(el('p', 'instr', ex.instr));
+  if (ex.extra) box.appendChild(el('div', 'note', ex.extra));
+  var body = el('div'); box.appendChild(body);
+  var bar = el('div', 'bar'), score = el('span', 'score', '');
+  var api;
+  function upd() {
+    var c = 0, a = 0;
+    api.items.forEach(function (x) { var s = x.state(); if (s !== null) { a++; if (s === 1) c++; } });
+    score.textContent = a ? 'Score: ' + c + ' / ' + api.items.length : '';
+  }
+  var bCheck = btn('Check all', 'primary', function () { api.checkAll(); upd(); });
+  var bTry = btn('Try again', 'ghost', function () { build(); });
+  var bShow = btn('Show answers', 'gold', function () { if (api.reveal) api.reveal(); else api.items.forEach(function (x) { x.reveal(); }); upd(); });
+  function build() { body.innerHTML = ''; api = KINDS[ex.kind](ex, body, upd); bCheck.hidden = !api.checkable; upd(); }
+  bar.appendChild(bCheck); bar.appendChild(bTry); if (TEACHER) bar.appendChild(bShow); bar.appendChild(score);
+  box.appendChild(bar); build();
+  return box;
+}
+
+/* ---------- blocks ---------- */
+function makePhoto(b) {
+  var f = el('figure', 'photo'), holder = el('div'); f.appendChild(holder);
+  function showSlot() {
+    holder.innerHTML = '';
+    var s = el('div', 'slot'), inner = el('div', null, esc(b.slot || 'Photo') + '<br>(photo to be added)');
+    if (TEACHER) {
+      var lab = el('label', null, 'Choose a photo'), inp = el('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.hidden = true;
+      inp.onchange = function () { if (inp.files[0]) showImg(URL.createObjectURL(inp.files[0])); };
+      lab.appendChild(inp); inner.appendChild(document.createElement('br')); inner.appendChild(lab);
+    }
+    s.appendChild(inner); holder.appendChild(s);
+  }
+  function showImg(src) { holder.innerHTML = ''; var im = new Image(); im.alt = b.alt || ''; im.onerror = showSlot; im.src = src; holder.appendChild(im); }
+  if (b.src) showImg(b.src); else showSlot();
+  f.appendChild(el('figcaption', null, b.cap || ''));
+  return f;
+}
+function makeQs(b) {
+  var d = el('section', 'qs'); d.appendChild(el('h3', null, b.title || 'Talk about it'));
+  var ol = el('ol'); b.items.forEach(function (t) { ol.appendChild(el('li', null, t)); }); d.appendChild(ol); return d;
+}
+function makeRead(b) {
+  var d = el('article', 'read'); d.appendChild(el('h3', null, b.title)); d.appendChild(el('p', 'sub', b.sub || ''));
+  b.paras.forEach(function (p) { d.appendChild(el('p', null, p)); });
+  if (b.gloss) {
+    var g = el('div', 'gloss'); b.gloss.forEach(function (x) { g.appendChild(el('div', null, '<strong>' + x[0] + '</strong> – ' + x[1])); }); d.appendChild(g);
+  }
+  return d;
+}
+function makeDetails(b) {
+  var d = el('details'); d.appendChild(el('summary', null, b.sum)); d.appendChild(el('div', 'tx', b.html)); return d;
+}
+function makeAudio(b) {
+  var box = el('div', 'audiobox'); box.appendChild(el('h3', null, b.title));
+  var a = document.createElement('audio'); a.controls = true; a.preload = 'metadata'; a.src = b.src;
+  var msg = el('p', 'status', '');
+  a.addEventListener('error', function () { a.hidden = true; msg.textContent = b.missing || 'The audio will appear here once it has been recorded.'; });
+  box.appendChild(a); box.appendChild(msg); if (b.note) box.appendChild(el('p', null, b.note)); return box;
+}
+function makeCards(b) {
+  var wrap = el('div'), cards = el('div', 'cards'), rates = {}, top = el('p', 'topline', '');
+  function upd() {
+    var best = 0, names = [];
+    b.items.forEach(function (c) { var v = rates[c.id] || 0; if (v > best) { best = v; names = [c.h]; } else if (v === best && v > 0) names.push(c.h); });
+    top.textContent = names.length ? 'Your most convincing theory so far: ' + names.join(' / ') : '';
+  }
+  b.items.forEach(function (c) {
+    var d = el('article', 'case');
+    d.innerHTML = '<header><h3>' + c.h + '</h3><span class="tag' + (c.fic ? ' fic' : '') + '">' + c.tag + '</span></header><p class="nar">' + c.nar + '</p><div class="evi"><div><b>For</b>' + c.pro + '</div><div class="ag"><b>Against</b>' + c.con + '</div></div>';
+    var r = el('div', 'rate', '<span>How convincing? 1 = not at all, 5 = very</span>');
+    [1, 2, 3, 4, 5].forEach(function (v) {
+      var bt = el('button', null, String(v)); bt.type = 'button'; bt.setAttribute('aria-pressed', 'false');
+      bt.onclick = function () {
+        rates[c.id] = v;
+        Array.prototype.forEach.call(r.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x === bt ? 'true' : 'false'); });
+        upd();
+      };
+      r.appendChild(bt);
+    });
+    d.appendChild(r); cards.appendChild(d);
+  });
+  wrap.appendChild(cards); wrap.appendChild(top); return wrap;
+}
+
+/* dictation */
+function lcsMatch(a, b) {
+  var n = a.length, m = b.length, dp = [], i, j;
+  for (i = 0; i <= n; i++) { dp[i] = []; for (j = 0; j <= m; j++) dp[i][j] = 0; }
+  for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+  var ma = [], mb = []; i = 0; j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { ma[i] = true; mb[j] = true; i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++;
+  }
+  return { a: ma, b: mb };
+}
+function tokens(s) {
+  return s.replace(/[’‘`]/g, "'").toLowerCase().split(/\s+/).map(function (w) { return w.replace(/[^a-z0-9']/g, ''); }).filter(Boolean);
+}
+function makeDictation(b) {
+  var wrap = el('div', 'stack');
+  wrap.appendChild(makeAudio({ title: 'Dictation recording', src: b.audio, missing: 'The recording will appear here. Your teacher can also read the text aloud.' }));
+  var how = el('div', 'note', '<h3>How it works</h3><ol style="margin:0;padding-left:20px"><li>Listen once to the whole text. Do not write.</li><li>Listen again, phrase by phrase, and type what you hear.</li><li>Listen a third time and correct your text.</li><li>Press <b>Check my dictation</b>.</li></ol>');
+  wrap.appendChild(how);
+  var box = el('div', 'box'), status = el('p', 'status', '');
+  var ta = el('textarea', 'in big'); ta.id = 'dict-text'; ta.setAttribute('aria-label', 'Type your dictation here'); ta.placeholder = 'Type what you hear.';
+  ta.value = sget('dict') || '';
+  var wc = el('p', 'wc', '');
+  function upd() { wc.textContent = wordCount(ta.value) + ' words typed'; sset('dict', ta.value); }
+  ta.addEventListener('input', upd); upd();
+  var res = el('div', 'dresult');
+  var bar = el('div', 'bar');
+  bar.appendChild(btn('Check my dictation', 'primary', check));
+  bar.appendChild(btn('Save as Word (.docx)', 'gold', function () {
+    if (!ta.value.trim()) { status.textContent = 'Type something first.'; return; }
+    saveBlob('Dictation.docx', makeDocx([{ text: 'Dictation', bold: true, size: 32 }].concat(textToParas(ta.value))), status);
+  }));
+  bar.appendChild(btn('Copy text', 'ghost', function () { copyText(ta.value, status); }));
+  bar.appendChild(btn('Clear', 'ghost', function () { ta.value = ''; res.innerHTML = ''; upd(); }));
+  box.appendChild(ta); box.appendChild(wc); box.appendChild(bar); box.appendChild(status); box.appendChild(res);
+  wrap.appendChild(box);
+  function check() {
+    if (!ta.value.trim()) { status.textContent = 'Type your dictation first.'; return; }
+    status.textContent = '';
+    var paras = b.text.split(/\n+/), flat = [], idx = [];
+    paras.forEach(function (p, pi) { p.split(/\s+/).filter(Boolean).forEach(function (w) { var t = tokens(w); if (t.length) { flat.push(t.join('')); idx.push([pi, w]); } else idx.push([pi, w, true]); }); });
+    var ot = [], map = [];
+    idx.forEach(function (x, k) { if (!x[2]) { ot.push(tokens(x[1]).join('')); map.push(k); } });
+    var st = tokens(ta.value), m = lcsMatch(ot, st), hit = 0;
+    var flags = {}; ot.forEach(function (w, k) { if (m.a[k]) { hit++; flags[map[k]] = 1; } });
+    var pct = Math.round(100 * hit / ot.length), out = '';
+    var cur = -1;
+    idx.forEach(function (x, k) {
+      if (x[0] !== cur) { if (cur !== -1) out += '</p>'; out += '<p>'; cur = x[0]; }
+      out += (x[2] || flags[k]) ? '<span class="hit">' + esc(x[1]) + '</span> ' : '<span class="miss">' + esc(x[1]) + '</span> ';
+    });
+    out += '</p>';
+    var extra = st.filter(function (w, k) { return !m.b[k]; });
+    res.innerHTML = '<p><b>Words correct: ' + hit + ' of ' + ot.length + ' (' + pct + '%).</b> Green = you wrote it. Red and wavy = missing or spelt differently in your text.</p>' + out +
+      (extra.length ? '<p><b>Words in your text that are not in the original:</b> ' + esc(extra.join(', ')) + '</p>' : '') +
+      '<p>This check ignores capital letters and punctuation. Compare those with the text yourself.</p>';
+  }
+  return wrap;
+}
+
+/* writing */
+function makeWrite(b) {
+  var wrap = el('div', 'stack');
+  var sel = sget('prompt'); if (sel === null || !b.prompts[+sel]) sel = '0';
+  var p1 = el('div', 'box'); p1.appendChild(el('h3', null, '1. Choose your task'));
+  var radios = el('div', 'radios'); radios.setAttribute('role', 'radiogroup');
+  b.prompts.forEach(function (p, i) {
+    var lab = el('label', i === +sel ? 'on' : '', '<input type="radio" name="gsprompt" value="' + i + '"' + (i === +sel ? ' checked' : '') + '><span>' + p + '</span>');
+    lab.querySelector('input').onchange = function () {
+      sset('prompt', String(i)); Array.prototype.forEach.call(radios.children, function (c) { c.className = ''; }); lab.className = 'on';
+    };
+    radios.appendChild(lab);
+  });
+  p1.appendChild(el('div', null, '')); p1.appendChild(radios); wrap.appendChild(p1);
+
+  var p2 = el('div', 'box'); p2.appendChild(el('h3', null, '2. Plan your story'));
+  p2.appendChild(el('p', 'instr', 'Make notes, not sentences. Four short paragraphs are enough.'));
+  b.plan.forEach(function (f, i) {
+    var d = el('div', 'field'); var id = 'plan' + i;
+    d.innerHTML = '<label for="' + id + '">' + f[0] + '</label>'; var t = el('textarea', 'in'); t.id = id; t.placeholder = f[1]; t.value = sget(id) || '';
+    t.addEventListener('input', function () { sset(id, t.value); }); d.appendChild(t); p2.appendChild(d);
+  });
+  wrap.appendChild(p2);
+
+  var p3 = el('div', 'box'); p3.appendChild(el('h3', null, '3. Write your story'));
+  p3.appendChild(el('p', 'instr', 'Write 140 to 190 words. Your text is kept in this browser while you work.'));
+  var ttl = el('input', 'in'); ttl.type = 'text'; ttl.id = 'storytitle'; ttl.placeholder = 'Title (optional)'; ttl.style.width = '100%'; ttl.setAttribute('aria-label', 'Story title'); ttl.value = sget('title') || '';
+  ttl.addEventListener('input', function () { sset('title', ttl.value); });
+  var ta = el('textarea', 'in big'); ta.id = 'storytext'; ta.setAttribute('aria-label', 'Your story'); ta.value = sget('story') || '';
+  var wc = el('p', 'wc', ''), status = el('p', 'status', '');
+  function upd() {
+    var n = wordCount(ta.value); wc.textContent = n + ' words (target 140–190)';
+    wc.className = 'wc ' + (n >= 140 && n <= 190 ? 'good' : n ? 'warn' : ''); sset('story', ta.value);
+  }
+  ta.addEventListener('input', upd); upd();
+  p3.appendChild(ttl); p3.appendChild(el('div', null, '')); p3.appendChild(ta); p3.appendChild(wc);
+  var bar = el('div', 'bar');
+  bar.appendChild(btn('Save as Word (.docx)', 'primary', function () {
+    if (!ta.value.trim()) { status.textContent = 'Write something first.'; return; }
+    var paras = [{ text: ttl.value.trim() || 'My ghost-ship story', bold: true, size: 32 }];
+    var plan = b.plan.map(function (f, i) { return (sget('plan' + i) || '').trim() ? f[0] + ': ' + sget('plan' + i).trim() : ''; }).filter(Boolean);
+    var chosen = b.prompts[+(sget('prompt') || 0)].replace(/<[^>]+>/g, '');
+    paras.push({ text: 'Task: ' + chosen, italic: true, size: 22 });
+    paras = paras.concat(textToParas(ta.value));
+    paras.push({ text: wordCount(ta.value) + ' words', italic: true, size: 20 });
+    if (plan.length) { paras.push({ text: 'My plan', bold: true, size: 26 }); plan.forEach(function (x) { paras.push({ text: x, size: 22, after: 80 }); }); }
+    saveBlob('Ghost-ship-story.docx', makeDocx(paras), status);
+  }));
+  bar.appendChild(btn('Copy text', 'ghost', function () { copyText((ttl.value ? ttl.value + '\n\n' : '') + ta.value, status); }));
+  bar.appendChild(btn('Clear my story', 'ghost', function () { ta.value = ''; ttl.value = ''; sset('title', ''); upd(); }));
+  p3.appendChild(bar); p3.appendChild(status); wrap.appendChild(p3);
+
+  var p4 = el('div', 'box'); p4.appendChild(el('h3', null, '4. Check before you finish'));
+  var ul = el('ul', 'checks');
+  b.checks.forEach(function (c, i) {
+    var id = 'chk' + i, li = el('li'); var lab = el('label'); var cb = el('input'); cb.type = 'checkbox'; cb.id = id; cb.checked = sget(id) === '1';
+    cb.onchange = function () { sset(id, cb.checked ? '1' : '0'); };
+    lab.appendChild(cb); lab.appendChild(el('span', null, c)); li.appendChild(lab); ul.appendChild(li);
+  });
+  p4.appendChild(ul); wrap.appendChild(p4);
+  wrap.appendChild(makeDetails({ sum: 'See a model plan and a model story', html: b.model }));
+  return wrap;
+}
+
+function makeBlock(b) {
+  switch (b.t) {
+    case 'html': return el('div', 'prose', b.html);
+    case 'note': return el('div', 'note', b.html);
+    case 'photo': return makePhoto(b);
+    case 'photos': { var g = el('div', 'photos'); b.items.forEach(function (p) { g.appendChild(makePhoto(p)); }); return g; }
+    case 'qs': return makeQs(b);
+    case 'read': return makeRead(b);
+    case 'ex': return makeEx(b);
+    case 'details': return makeDetails(b);
+    case 'audio': return makeAudio(b);
+    case 'cards': return makeCards(b);
+    case 'dictation': return makeDictation(b);
+    case 'write': return makeWrite(b);
+    case 'table': { var w = el('div', 'tw'); w.innerHTML = b.html; return w; }
+  }
+  return el('div');
+}
+
+/* ---------- stages ---------- */
+var tabs = document.getElementById('tabs'), stageEl = document.getElementById('stage'), cur = 0, chips = [];
+
+function makeHome() {
+  var d = el('div', 'stack home');
+  d.appendChild(el('p', 'lede', L.intro));
+  var rows = L.stages.slice(1).map(function (s, i) {
+    return '<tr><td class="m">' + s.min + ' min</td><td><button type="button" data-go="' + (i + 1) + '">' + s.title + '</button></td><td>' + s.desc + '</td></tr>';
+  }).join('');
+  var total = L.stages.reduce(function (a, s) { return a + (s.min || 0); }, 0);
+  var t = el('div', 'tw', '<table class="tt" style="min-width:520px"><thead><tr><th>Time</th><th>Stage</th><th>What you do</th></tr></thead><tbody>' + rows + '</tbody></table>');
+  Array.prototype.forEach.call(t.querySelectorAll('[data-go]'), function (b) { b.onclick = function () { show(+b.getAttribute('data-go')); }; });
+  d.appendChild(t);
+  d.appendChild(el('p', null, '<b>Total: ' + total + ' minutes.</b> ' + L.homeNote));
+  d.appendChild(btn('Start the lesson', 'next', function () { show(1); }));
+  return d;
+}
+
+function show(i) {
+  cur = i; var s = L.stages[i];
+  chips.forEach(function (c, k) { c.setAttribute('aria-current', k === i ? 'true' : 'false'); });
+  stageEl.innerHTML = '';
+  var wrap = el('div', 'stagewrap');
+  if (TEACHER) wrap.appendChild(el('div', 'tbanner', 'Teacher mode: use "Show answers" on any exercise'));
+  var head = el('div', 'stagehead'); head.appendChild(el('h2', null, s.title)); if (s.min) head.appendChild(el('span', 'mins', s.min + ' min'));
+  wrap.appendChild(head);
+  var st = el('div', 'stack');
+  if (s.home) st.appendChild(makeHome()); else s.blocks.forEach(function (b) { st.appendChild(makeBlock(b)); });
+  wrap.appendChild(st);
+  var foot = el('div', 'foot');
+  if (i > 0) foot.appendChild(btn('← ' + L.stages[i - 1].nav, 'ghost', function () { show(i - 1); }));
+  else foot.appendChild(el('span'));
+  if (i < L.stages.length - 1 && !s.home) foot.appendChild(btn('Next: ' + L.stages[i + 1].nav + ' →', 'next', function () { show(i + 1); }));
+  wrap.appendChild(foot);
+  stageEl.appendChild(wrap);
+  sset('stage', String(i));
+  window.scrollTo(0, 0);
+  var c = chips[i]; if (c && c.scrollIntoView) { try { c.scrollIntoView({ inline: 'center', block: 'nearest' }); } catch (e) {} }
+}
+
+L.stages.forEach(function (s, i) {
+  var c = el('button', 'chip', (i ? '<b>' + i + '</b>' : '') + s.nav); c.type = 'button'; c.setAttribute('aria-current', 'false');
+  c.onclick = function () { show(i); }; tabs.appendChild(c); chips.push(c);
+});
+var start = parseInt(sget('stage') || '0', 10); if (!(start >= 0 && start < L.stages.length)) start = 0;
+show(start);
+})();
+
+</script>
+</body></html>
